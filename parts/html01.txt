@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3eee7">
+<meta name="description" content="Свадебное приглашение Марата и Карины — 25 августа 2026">
+<title>Марат & Карина — 25 августа 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+:root{--ivory:#f7f2eb;--ivory2:#efe5d8;--cream:#fbf8f3;--ink:#3d332c;--muted:#8c7b70;--gold:#b99662;--rose:#d8b8ab;--shadow:0 28px 80px rgba(62,45,34,.16)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ivory)}
+body{margin:0;background:var(--ivory);color:var(--ink);font-family:Manrope,system-ui,sans-serif;overflow-x:hidden}
+a{color:inherit}
+button,input{font:inherit}
+.serif{font-family:'Cormorant Garamond',Georgia,serif}
+.container{width:min(980px,calc(100% - 40px));margin-inline:auto}
+.section{position:relative;padding:110px 0;overflow:hidden}
+.kicker{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#9a7a50}
+.title{font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;font-size:clamp(48px,10vw,92px);line-height:.92;letter-spacing:-.045em;margin:14px 0 26px}
+.lead{font-family:'Cormorant Garamond',Georgia,serif;font-size:clamp(25px,5vw,38px);line-height:1.25;max-width:760px;margin:0 auto}
+.copy{max-width:660px;margin:24px auto 0;line-height:1.85;color:var(--muted);font-size:14px}
+.center{text-align:center}
+.gold-line{width:1px;height:82px;background:linear-gradient(transparent,var(--gold),transparent);margin:34px auto}
+.btn{appearance:none;border:0;border-radius:999px;min-height:56px;padding:0 28px;display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;text-transform:uppercase;font-size:10px;letter-spacing:.18em;cursor:pointer;transition:.3s ease}
+.btn-primary{background:linear-gradient(135deg,#d8bd91,#b58d57);color:#241b14;box-shadow:0 16px 40px rgba(181,141,87,.25)}
+.btn-light{background:rgba(255,255,255,.62);border:1px solid rgba(80,59,45,.15);backdrop-filter:blur(16px)}
+.btn:active{transform:scale(.98)}
+
+/* Envelope opening */
+.envelope-screen{position:fixed;inset:0;z-index:1000;background:radial-gradient(circle at 50% 25%,#fff 0,#f6efe6 48%,#eadfd1 100%);display:grid;place-items:center;padding:24px;transition:opacity .9s ease,visibility .9s ease}
+.envelope-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.envelope-wrap{width:min(430px,92vw);text-align:center}
+.envelope-caption{margin-bottom:25px}
+.envelope-caption .small{font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:#927959}
+.envelope-caption h1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:54px;line-height:.9;margin:12px 0 0}
+.envelope{position:relative;width:100%;aspect-ratio:1.45/1;perspective:1300px;filter:drop-shadow(0 30px 35px rgba(85,60,43,.18));margin-bottom:28px}
+.env-back{position:absolute;inset:0;background:linear-gradient(145deg,#dfcdb8,#cdb59b);clip-path:polygon(0 0,100% 0,100% 100%,0 100%);border-radius:6px}
+.env-letter{position:absolute;left:8%;right:8%;bottom:7%;height:80%;background:#fffaf4;border:1px solid rgba(120,88,61,.12);display:grid;place-items:center;text-align:center;padding:30px;transition:transform 1.1s cubic-bezier(.2,.75,.2,1),opacity .8s;z-index:2}
+.env-letter .mk{font-family:'Cormorant Garamond',serif;font-size:60px;line-height:.78}
+.env-letter .mk em{display:block;font-size:.5em;color:#b38c5d;font-weight:400;margin:.3em 0}
+.env-front{position:absolute;inset:0;background:linear-gradient(160deg,#e7d5c0,#c9ad90);clip-path:polygon(0 42%,50% 74%,100% 42%,100% 100%,0 100%);z-index:4;border-radius:0 0 6px 6px}
+.env-side-left{position:absolute;inset:0;background:#d9c2a8;clip-path:polygon(0 0,52% 55%,0 100%);z-index:3}
+.env-side-right{position:absolute;inset:0;background:#d1b89d;clip-path:polygon(100% 0,48% 55%,100% 100%);z-index:3}
+.env-flap{position:absolute;inset:0;background:linear-gradient(145deg,#ead9c5,#cdb297);clip-path:polygon(0 0,100% 0,50% 62%);z-index:6;transform-origin:top;transition:transform 1s cubic-bezier(.2,.7,.2,1)}
+.wax{position:absolute;width:72px;height:72px;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-42%);z-index:8;background:radial-gradient(circle at 35% 30%,#d6b47e,#a47742 70%);box-shadow:0 10px 22px rgba(88,53,28,.3),inset 0 0 0 5px rgba(255,255,255,.08);display:grid;place-items:center;color:#f8ead5;font-family:'Cormorant Garamond',serif;font-size:27px;transition:opacity .45s,transform .6s}
+.envelope.opening .env-flap{transform:rotateX(180deg);z-index:1}
+.envelope.opening .wax{opacity:0;transform:translate(-50%,-42%) scale(.55)}
+.envelope.opening .env-letter{transform:translateY(-48%);z-index:7}
+.open-btn{width:100%;max-width:330px}
+.sound-note{font-size:11px;color:#9a887c;margin-top:12px}
+
+/* Hero */
+.hero{min-height:100svh;display:flex;align-items:flex-end;color:white;background:#3c3029;position:relative}
+.hero-photo{position:absolute;inset:0;background-image:linear-gradient(180deg,rgba(43,32,25,.04),rgba(43,32,25,.12) 42%,rgba(32,23,18,.86) 100%),url(__HERO__);background-size:cover;background-position:center 25%;transform:scale(1.02);animation:slowZoom 18s ease-out both}
+@keyframes slowZoom{from{transform:scale(1.08)}to{transform:scale(1)}}
+.hero::after{content:'';position:absolute;inset:16px;border:1px solid rgba(255,255,255,.24);pointer-events:none}
+.hero-content{position:relative;z-index:2;width:min(900px,calc(100% - 42px));margin:0 auto;padding:80px 0 70px;text-align:center}
+.hero-kicker{font-size:10px;letter-spacing:.35em;text-transform:uppercase;opacity:.8}
+.hero h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(66px,16vw,136px);line-height:.7;letter-spacing:-.065em;margin:22px 0 30px;text-shadow:0 8px 30px rgba(0,0,0,.25)}
+.hero h2 span{display:block}
+.hero h2 em{display:block;font-size:.35em;line-height:1;color:#e7cfaa;font-weight:400;margin:.35em 0;letter-spacing:0}
+.hero-date{font-family:'Cormorant Garamond',serif;font-size:22px;letter-spacing:.22em}
+.scroll-cue{display:inline-flex;margin-top:32px;align-items:center;gap:10px;font-size:9px;letter-spacing:.22em;text-transform:uppercase;text-decoration:none;color:white;opacity:.82}
+.scroll-cue i{display:block;width:38px;height:1px;background:rgba(255,255,255,.55)}
+
+.intro{background:radial-gradient(circle at 18% 0,rgba(216,184,171,.16),transparent 34%),linear-gradient(145deg,#faf7f2,#f2e9de)}
+.intro-card{max-width:850px;margin:auto;padding:80px 32px;border:1px solid rgba(154,122,80,.24);background:rgba(255,255,255,.34);box-shadow:var(--shadow);position:relative}
+.intro-card:before,.intro-card:after{content:'';position:absolute;width:18px;height:18px;border-color:#b99662}
+.intro-card:before{left:16px;top:16px;border-left:1px solid;border-top:1px solid}
+.intro-card:after{right:16px;bottom:16px;border-right:1px solid;border-bottom:1px solid}
+.signature{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:30px;color:#8c6a44;margin-top:28px}
+
+.date-section{background:#fffaf5}
+.date-layout{display:grid;grid-template-columns:.9fr 1.1fr;gap:50px;align-items:center}
+.date-number{font-family:'Cormorant Garamond',serif;font-size:clamp(145px,26vw,260px);line-height:.62;letter-spacing:-.08em;color:#b58d5e;text-align:center}
+.date-meta{text-align:left}
+.date-meta .month{font-family:'Cormorant Garamond',serif;font-size:62px;line-height:.9}
+.date-meta .year{font-size:11px;letter-spacing:.45em;margin-top:16px;color:#8f7a6c}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:40px}
+.count-unit{border-top:1px solid rgba(181,141,94,.36);border-bottom:1px solid rgba(181,141,94,.36);padding:18px 4px;text-align:center}
+.count-unit b{display:block;font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(34px,7vw,55px);line-height:1}
+.count-unit span{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#8e7c70}
+.date-note{margin-top:24px;color:#8a786b;font-size:13px}
+
+.place{background:linear-gradient(140deg,#3a302a,#201a16);color:#fbf4eb}
+.place .kicker{color:#dfc49d}
+.venue-card{max-width:790px;margin:38px auto 0;border:1px solid rgba(223,196,157,.3);padding:58px 34px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015));box-shadow:0 30px 80px rgba(0,0,0,.18)}
+.venue-name{font-family:'Cormorant Garamond',serif;font-size:clamp(54px,11vw,90px);line-height:.86;color:#f3dfbf}
+.venue-address{margin-top:24px;color:rgba(255,255,255,.67);line-height:1.8}
+.place-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:30px}
+.place .btn-light{color:white;background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.22)}
+
+.special{background:radial-gradient(circle at 75% 10%,rgba(216,184,171,.24),transparent 34%),var(--cream)}
+.promise{max-width:680px;margin:36px auto 0;position:relative}
+.promise-card{padding:55px 35px;border-radius:180px 180px 22px 22px;background:#fff;box-shadow:var(--shadow);border:1px solid rgba(174,139,96,.16)}
+.promise-seal{width:78px;height:78px;border-radius:50%;margin:-92px auto 28px;background:radial-gradient(circle at 35% 30%,#dab77e,#a87a43);color:#faead2;display:grid;place-items:center;font-family:'Cormorant Garamond',serif;font-size:26px;box-shadow:0 12px 30px rgba(98,64,36,.22)}
+.promise-text{font-family:'Cormorant Garamond',serif;font-size:clamp(30px,6vw,46px);line-height:1.18}
+.quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:25px;color:#806a5c;margin-top:26px}
+
+.rsvp{background:linear-gradient(145deg,#efe4d7,#faf7f2)}
+.rsvp-box{max-width:720px;margin:36px auto 0;padding:44px 30px;background:rgba(255,255,255,.64);border:1px solid rgba(139,105,71,.18);box-shadow:var(--shadow);text-align:left}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8d7565;margin-bottom:9px}
+.field input{width:100%;height:50px;border:0;border-bottom:1px solid #bda892;background:transparent;border-radius:0;outline:none;color:var(--ink);font-size:15px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice input{position:absolute;opacity:0}
+.choice label{min-height:58px;border:1px solid #c5ae94;border-radius:14px;display:grid;place-items:center;text-align:center;padding:9px;cursor:pointer;font-size:12px;color:#6e5b4f;transition:.25s;background:rgba(255,255,255,.4)}
+.choice input:checked+label{background:#4a3c33;color:white;border-color:#4a3c33;box-shadow:0 12px 30px rgba(58,45,37,.14)}
+.rsvp-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.rsvp-actions .btn{flex:1}
+.rsvp-result{display:none;margin-top:22px;padding:20px;border-radius:14px;background:#f5ede3;text-align:center;color:#6f5c4e}
+.rsvp-result.show{display:block}
+
+.final{min-height:95svh;display:grid;place-items:center;text-align:center;color:white;background:linear-gradient(rgba(43,31,24,.38),rgba(29,21,17,.82)),url(__HERO__) center 28%/cover no-repeat;position:relative}
+.final::before{content:'';position:absolute;inset:18px;border:1px solid rgba(255,255,255,.22)}
+.final-content{position:relative;z-index:1;padding:70px 24px}
+.final h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(58px,13vw,112px);line-height:.84;margin:20px 0}
+.final-date{font-family:'Cormorant Garamond',serif;font-size:24px;letter-spacing:.18em;color:#efd8b4}
+
+.music{position:fixed;right:16px;bottom:16px;z-index:80;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.42);background:rgba(53,42,35,.7);backdrop-filter:blur(14px);color:white;display:grid;place-items:center;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.16);opacity:0;pointer-events:none;transition:.4s}
+.music.show{opacity:1;pointer-events:auto}
+.music.playing{color:#f3d7a8}
+.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);z-index:90;background:#3f332b;color:white;padding:13px 18px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.js .reveal{opacity:0;transform:translateY(28px);transition:opacity 1s ease,transform 1s cubic-bezier(.22,.8,.2,1)}
+.js .reveal.visible{opacity:1;transform:none}
+
+@media(max-width:720px){
+ .section{padding:84px 0}
+ .container{width:min(100% - 28px,980px)}
+ .hero-photo{background-position:center 20%}
+ .hero-content{padding-bottom:52px}
+ .intro-card{padding:58px 22px}
+ .date-layout{grid-template-columns:1fr;gap:34px}
+ .date-meta{text-align:center}
+ .countdown{gap:4px}
+ .venue-card{padding:46px 20px}
+ .promise-card{padding:50px 22px 40px}
+ .rsvp-box{padding:34px 18px}
+ .choices{grid-template-columns:1fr}
+ .rsvp-actions{flex-direction:column}
+ .envelope-caption h1{font-size:46px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="envelope-screen" id="envelopeScreen" aria-label="Открытие приглашения">
+  <div class="envelope-wrap">
+    <div class="envelope-caption"><div class="small">личное приглашение</div><h1>Марат & Карина</h1></div>
+    <div class="envelope" id="envelope">
+      <div class="env-back"></div>
+      <div class="env-letter"><div class="mk">Марат<em>&</em>Карина</div></div>
+      <div class="env-side-left"></div><div class="env-side-right"></div><div class="env-front"></div><div class="env-flap"></div><div class="wax">МК</div>
+    </div>
+    <button class="btn btn-primary open-btn" id="openInvitation">Открыть приглашение</button>
+    <div class="sound-note">После открытия заиграет музыка</div>
+  </div>
+</div>
+<button class="music" id="musicBtn" aria-label="Включить или выключить музыку">♫</button>
+<div class="toast" id="toast"></div>
+
+<main>
+<section class="hero" id="home">
+  <div class="hero-photo"></div>
+  <div class="hero-content">
+    <div class="hero-kicker">свадебное приглашение</div>
+    <h2><span>Марат</span><em>&</em><span>Карина</span></h2>
+    <div class="hero-date">25 · 08 · 2026</div>
+    <a class="scroll-cue" href="#invite"><i></i>листайте вниз<i></i></a>
+  </div>
+</section>
+
+<section class="section intro" id="invite">
+  <div class="container center reveal">
+    <div class="intro-card">
+      <div class="kicker">дорогие родные и друзья</div>
+      <h2 class="title">Этот день станет началом нашей семьи</h2>
+      <p class="lead">Есть моменты, которые хочется прожить только рядом с самыми близкими.</p>
+      <div class="gold-line"></div>
+      <p class="copy">Мы будем счастливы, если 25 августа вы разделите с нами день, наполненный любовью, теплом и новым началом.</p>
+      <div class="signature">С любовью, Марат и Карина</div>
+    </div>
+  </div>
+</section>
+
+<section class="section date-section" id="date">
+  <div class="container date-layout">
+    <div class="date-number reveal">25</div>
+    <div class="date-meta reveal">
+      <div class="kicker">сохраните эту дату</div>
+      <div class="month">августа</div>
+      <div class="year">2026</div>
+      <div class="countdown" aria-label="Обратный отсчёт">
+        <div class="count-unit"><b id="days">00</b><span>дней</span></div>
+        <div class="count-unit"><b id="hours">00</b><span>часов</span></div>
+        <div class="count-unit"><b id="minutes">00</b><span>минут</span></div>
+        <div class="count-unit"><b id="seconds">00</b><span>секунд</span></div>
+      </div>
+      <div class="date-note">Точное время начала торжества будет сообщено дополнительно.</div>
+      <div style="margin-top:24px"><button class="btn btn-primary" id="calendarBtn">Добавить в календарь</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="section place" id="place">
+  <div class="cont
