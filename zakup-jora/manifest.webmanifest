@@ -1,0 +1,11 @@
+{
+  "name": "Zakup Jora",
+  "short_name": "Zakup Jora",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#121510",
+  "theme_color": "#121510",
+  "lang": "ru",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
