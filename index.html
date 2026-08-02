@@ -18,9 +18,13 @@ html,body{margin:0;height:100%;background:#f6efe7;color:#6e5b4f;font-family:Geor
 Promise.all([
  fetch('parts/html01.txt').then(r=>{if(!r.ok)throw Error('html01');return r.text()}),
  fetch('parts/html02.txt').then(r=>{if(!r.ok)throw Error('html02');return r.text()}),
- fetch('parts/img.txt').then(r=>{if(!r.ok)throw Error('img');return r.text()})
-]).then(([a,b,img])=>{
- const page=(a+b).replaceAll('__HERO__','data:image/webp;base64,'+img.trim());
+ fetch('parts/img01.txt').then(r=>{if(!r.ok)throw Error('img01');return r.text()}),
+ fetch('parts/img02.txt').then(r=>{if(!r.ok)throw Error('img02');return r.text()}),
+ fetch('parts/img03.txt').then(r=>{if(!r.ok)throw Error('img03');return r.text()}),
+ fetch('parts/img04.txt').then(r=>{if(!r.ok)throw Error('img04');return r.text()})
+]).then(([a,b,i1,i2,i3,i4])=>{
+ const image=(i1+i2+i3+i4).replace(/\s/g,'');
+ const page=(a+b).replaceAll('__HERO__','data:image/webp;base64,'+image);
  document.open();document.write(page);document.close();
 }).catch(()=>{
  document.body.innerHTML='<div class="loading"><div><b>Марат & Карина</b><span>обновите страницу</span></div></div>';
