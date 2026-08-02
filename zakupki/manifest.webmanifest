@@ -1,0 +1,19 @@
+{
+  "name": "Фруктодар — Закупки",
+  "short_name": "Закупки",
+  "description": "Список закупок Фруктодар с цветными кружками и офлайн-режимом",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f2ed",
+  "theme_color": "#11130f",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
