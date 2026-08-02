@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#11130f" />
+  <meta name="description" content="Удобный список закупки Фруктодар с цветными кружками, историей и офлайн-режимом." />
+  <title>Фруктодар — Закупки</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">Ф</div>
+        <div>
+          <div class="eyebrow">FRUKTODAR</div>
+          <h1>Закупки</h1>
+        </div>
+      </div>
+      <button class="icon-btn" id="menuBtn" aria-label="Открыть настройки" title="Настройки">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </header>
+
+    <main>
+      <section class="hero-card">
+        <div>
+          <span class="hero-label">Активная закупка</span>
+          <div class="hero-count"><strong id="activeCount">0</strong><span>позиций осталось</span></div>
+        </div>
+        <div class="progress-ring" id="progressRing" style="--progress:0deg">
+          <div><strong id="progressText">0%</strong><span>куплено</span></div>
+        </div>
+      </section>
+
+      <section class="quick-entry-card">
+        <div class="section-title-row">
+          <div>
+            <span class="section-kicker">Быстрое добавление</span>
+            <h2>Продиктуйте или вставьте список</h2>
+          </div>
+          <button class="voice-btn" id="voiceBtn" type="button" aria-label="Голосовой ввод" title="Голосовой ввод">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3M8 21h8"/></svg>
+          </button>
+        </div>
+        <textarea id="bulkInput" rows="3" placeholder="Картофель молодой надо&#10;Огурец Герман остаток 1 ящик&#10;Авокадо Хаас остаток 4 упаковки"></textarea>
+        <div class="quick-actions">
+          <button class="ghost-btn" id="clearBulkBtn" type="button">Очистить</button>
+          <button class="primary-btn" id="parseBtn" type="button">
+            <span>Добавить в закупку</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <section class="toolbar">
+        <div class="tabs" role="tablist" aria-label="Разделы списка">
+          <button class="tab active" data-view="active" role="tab">Купить <span id="activeBadge">0</span></button>
+          <button class="tab" data-view="bought" role="tab">Куплено <span id="boughtBadge">0</span></button>
+          <button class="tab" data-view="archive" role="tab">Архив</button>
+        </div>
+
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="searchInput" type="search" placeholder="Найти товар" autocomplete="off" />
+          <button id="clearSearchBtn" class="search-clear hidden" aria-label="Очистить поиск">×</button>
+        </div>
+
+        <div class="filter-row" id="filterRow" aria-label="Фильтр по месту закупки">
+          <button class="filter-chip active" data-filter="all">Все</button>
+          <button class="filter-chip" data-filter="red"><i class="dot red"></i>Яма</button>
+          <button class="filter-chip" data-filter="green"><i class="dot green"></i>Хутор</button>
+          <button class="filter-chip" data-filter="yellow"><i class="dot yellow"></i>Орехи</button>
+          <button class="filter-chip" data-filter="purple"><i class="dot purple"></i>Гипермаркет</button>
+        </div>
+      </section>
+
+      <section id="listContainer" class="list-container" aria-live="polite"></section>
+    </main>
+
+    <button class="fab" id="addBtn" type="button" aria-label="Добавить товар">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Добавить</span>
+    </button>
+  </div>
+
+  <dialog id="itemDialog" class="modal">
+    <form method="dialog" id="itemForm" class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="section-kicker">Новая позиция</span>
+          <h2 id="itemDialogTitle">Добавить товар</h2>
+        </div>
+        <button class="icon-btn close-btn" value="cancel" aria-label="Закрыть" type="submit">×</button>
+      </div>
+      <input type="hidden" id="editingId" />
+      <label class="field-label">Название товара
+        <input id="itemName" required maxlength="120" placeholder="Например, огурец Бьерн" autocomplete="off" />
+      </label>
+      <label class="field-label">Количество или остаток
+        <input id="itemAmount" maxlength="80" placeholder="Например, 2 ящика / запаса нет" autocomplete="off" />
+      </label>
+      <fieldset class="marker-fieldset">
+        <legend>Где покупать</legend>
+        <div class="marker-options">
+          <label class="marker-option red-option"><input type="radio" name="marker" value="red"><span><i class="dot red"></i><b>Яма</b><small>местное</small></span></label>
+          <label class="marker-option green-option"><input type="radio" name="marker" value="green" checked><span><i class="dot green"></i><b>Хутор</b><small>импортное</small></span></label>
+          <label class="marker-option yellow-option"><input type="radio" name="marker" value="yellow"><span><i class="dot yellow"></i><b>Орехи</b><small>сухофрукты</small></span></label>
+          <label class="marker-option purple-option"><input type="radio" name="marker" value="purple"><span><i class="dot purple"></i><b>Магазин</b><small>Лента / Ашан</small></span></label>
+        </div>
+      </fieldset>
+      <label class="field-label">Комментарий
+        <textarea id="itemNote" rows="2" maxlength="180" placeholder="Цена, поставщик, важное уточнение"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button class="ghost-btn" value="cancel" type="submit">Отмена</button>
+        <button class="primary-btn" id="saveItemBtn" value="default" type="submit">Сохранить</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="modal">
+    <div class="modal-card settings-card">
+      <div class="modal-header">
+        <div>
+          <span class="section-kicker">Управление</span>
+          <h2>Настройки и данные</h2>
+        </div>
+        <button class="icon-btn close-btn" id="closeSettingsBtn" aria-label="Закрыть">×</button>
+      </div>
+      <div class="settings-list">
+        <button id="shareBtn" class="settings-action"><span class="settings-icon">↗</span><span><b>Отправить список</b><small>Поделиться активной закупкой</small></span></button>
+        <button id="exportBtn" class="settings-action"><span class="settings-icon">⇩</span><span><b>Скачать резервную копию</b><small>Все позиции в JSON-файле</small></span></button>
+        <label class="settings-action file-action"><span class="settings-icon">⇧</span><span><b>Восстановить из файла</b><small>Импорт резервной копии</small></span><input type="file" id="importInput" accept="application/json" /></label>
+        <button id="archiveBoughtBtn" class="settings-action"><span class="settings-icon">✓</span><span><b>Перенести купленное в архив</b><small>Очистить раздел «Куплено»</small></span></button>
+        <button id="clearAllBtn" class="settings-action danger"><span class="settings-icon">×</span><span><b>Удалить все данные</b><small>Действие нельзя отменить</small></span></button>
+      </div>
+      <div class="sync-note"><span>Офлайн-режим</span><p>Список сохраняется на этом устройстве и работает без интернета.</p></div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <template id="emptyTemplate">
+    <div class="empty-state">
+      <div class="empty-icon">✓</div>
+      <h3></h3>
+      <p></p>
+    </div>
+  </template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
