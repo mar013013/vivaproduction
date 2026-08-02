@@ -1,0 +1,119 @@
+ainer center reveal">
+    <div class="kicker">место торжества</div>
+    <h2 class="title">Старый город</h2>
+    <div class="venue-card">
+      <div class="venue-name">Краснодар</div>
+      <div class="venue-address">Ресторан «Старый город»<br>ул. имени Василия Мачуги, 111</div>
+      <div class="place-actions">
+        <a class="btn btn-primary" target="_blank" rel="noopener" href="https://yandex.ru/maps/?text=%D0%A0%D0%B5%D1%81%D1%82%D0%BE%D1%80%D0%B0%D0%BD%20%D0%A1%D1%82%D0%B0%D1%80%D1%8B%D0%B9%20%D0%B3%D0%BE%D1%80%D0%BE%D0%B4%2C%20%D0%9C%D0%B0%D1%87%D1%83%D0%B3%D0%B8%20111%2C%20%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B4%D0%B0%D1%80">Открыть маршрут</a>
+        <button class="btn btn-light" id="copyAddress">Скопировать адрес</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section special">
+  <div class="container center reveal">
+    <div class="kicker">для нас это важно</div>
+    <h2 class="title">Ждём именно вас</h2>
+    <div class="promise">
+      <div class="promise-card">
+        <div class="promise-seal">МК</div>
+        <div class="promise-text">Ваше присутствие — часть воспоминания, которое останется с нами на всю жизнь.</div>
+        <div class="quote">«Любовь становится домом, когда её разделяют с близкими»</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section rsvp" id="rsvp">
+  <div class="container center reveal">
+    <div class="kicker">просим ответить</div>
+    <h2 class="title">Вы будете с нами?</h2>
+    <p class="copy" style="margin-top:0">Выберите ответ — мы подготовим красивое сообщение, которое можно отправить через WhatsApp.</p>
+    <form class="rsvp-box" id="rsvpForm">
+      <div class="field"><label for="guestName">Ваше имя и фамилия</label><input id="guestName" autocomplete="name" required placeholder="Введите имя"></div>
+      <div class="field"><label>Ваш ответ</label>
+        <div class="choices">
+          <div class="choice"><input type="radio" id="yes" name="attendance" value="С радостью буду" required><label for="yes">С радостью буду</label></div>
+          <div class="choice"><input type="radio" id="no" name="attendance" value="К сожалению, не смогу"><label for="no">К сожалению, не смогу</label></div>
+        </div>
+      </div>
+      <div class="rsvp-actions">
+        <button class="btn btn-primary" type="submit">Подготовить ответ</button>
+        <button class="btn btn-light" type="button" id="copyReply">Скопировать ответ</button>
+      </div>
+      <div class="rsvp-result" id="rsvpResult"></div>
+    </form>
+  </div>
+</section>
+
+<section class="final">
+  <div class="final-content reveal">
+    <div class="hero-kicker">с любовью</div>
+    <h2>До встречи<br>25 августа</h2>
+    <div class="final-date">Марат & Карина</div>
+  </div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const toast=t=>{const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>el.classList.remove('show'),2200)};
+
+// Envelope and music
+let audioCtx=null,playing=false,musicTimer=null;
+const progression=[
+ [[261.63,329.63,392.00],[392.00,493.88,587.33]],
+ [[220.00,261.63,329.63],[329.63,415.30,493.88]],
+ [[174.61,220.00,261.63],[261.63,329.63,392.00]],
+ [[196.00,246.94,293.66],[293.66,369.99,440.00]]
+];
+function pianoTone(freq,start,dur,gain=.028){
+ const o=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain();
+ o.type='sine';o2.type='triangle';o.frequency.value=freq;o2.frequency.value=freq*2;
+ g.gain.setValueAtTime(.0001,start);g.gain.exponentialRampToValueAtTime(gain,start+.025);g.gain.exponentialRampToValueAtTime(.0001,start+dur);
+ o.connect(g);o2.connect(g);g.connect(audioCtx.destination);o.start(start);o2.start(start);o.stop(start+dur+.1);o2.stop(start+dur+.1);
+}
+function playPhrase(){if(!audioCtx||!playing)return;let t=audioCtx.currentTime+.05;progression.forEach((pair,i)=>{pair[0].forEach((f,j)=>pianoTone(f,t+i*2.2,2.5,.012+(j===0?.005:0)));pair[1].forEach((f,j)=>pianoTone(f,t+i*2.2+.95,1.4,.006));})}
+function startMusic(){
+ if(playing)return;audioCtx=new (window.AudioContext||window.webkitAudioContext)();playing=true;$('#musicBtn').classList.add('playing','show');playPhrase();musicTimer=setInterval(playPhrase,8800);
+}
+function stopMusic(){playing=false;clearInterval(musicTimer);if(audioCtx)audioCtx.close();audioCtx=null;$('#musicBtn').classList.remove('playing')}
+$('#openInvitation').addEventListener('click',()=>{
+ $('#envelope').classList.add('opening');startMusic();
+ setTimeout(()=>{$('#envelopeScreen').classList.add('hidden');$('#musicBtn').classList.add('show');location.hash='home'},1450);
+});
+$('#musicBtn').addEventListener('click',()=>{playing?stopMusic():startMusic();toast(playing?'Музыка включена':'Музыка выключена')});
+
+// Countdown
+const wedding=new Date('2026-08-25T00:00:00+03:00');
+function tick(){const ms=Math.max(0,wedding-Date.now());const v=[Math.floor(ms/86400000),Math.floor(ms/3600000)%24,Math.floor(ms/60000)%60,Math.floor(ms/1000)%60];['days','hours','minutes','seconds'].forEach((id,i)=>$('#'+id).textContent=String(v[i]).padStart(2,'0'))}
+tick();setInterval(tick,1000);
+
+// Reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.13});
+document.querySelectorAll('.reveal').forEach(x=>io.observe(x));
+
+// Address
+$('#copyAddress').addEventListener('click',async()=>{const text='Ресторан «Старый город», Краснодар, ул. имени Василия Мачуги, 111';try{await navigator.clipboard.writeText(text);toast('Адрес скопирован')}catch(e){prompt('Скопируйте адрес:',text)}});
+
+// Calendar
+$('#calendarBtn').addEventListener('click',()=>{const ics=`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Marat Karina Wedding//RU
+BEGIN:VEVENT
+UID:marat-karina-20260825
+DTSTART;VALUE=DATE:20260825
+DTEND;VALUE=DATE:20260826
+SUMMARY:Свадьба Марата и Карины
+LOCATION:Ресторан Старый город, Краснодар, ул. Василия Мачуги, 111
+END:VEVENT
+END:VCALENDAR`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'}));a.download='Свадьба_Марат_Карина_25-08-2026.ics';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Дата готова для календаря')});
+
+// RSVP
+let reply='';
+$('#rsvpForm').addEventListener('submit',e=>{e.preventDefault();const name=$('#guestName').value.trim();const answer=document.querySelector('input[name="attendance"]:checked')?.value;if(!name||!answer)return;reply=`Здравствуйте! Это ${name}. Мой ответ на приглашение Марата и Карины: ${answer}.`;const url='https://wa.me/?text='+encodeURIComponent(reply);$('#rsvpResult').innerHTML=`Спасибо, ${name}.<br><a class="btn btn-primary" style="margin-top:16px" target="_blank" rel="noopener" href="${url}">Отправить через WhatsApp</a>`;$('#rsvpResult').classList.add('show');$('#rsvpResult').scrollIntoView({behavior:'smooth',block:'center'})});
+$('#copyReply').addEventListener('click',async()=>{if(!reply){toast('Сначала заполните форму');return}try{await navigator.clipboard.writeText(reply);toast('Ответ скопирован')}catch(e){prompt('Скопируйте ответ:',reply)}});
+</script>
+</body></html>
