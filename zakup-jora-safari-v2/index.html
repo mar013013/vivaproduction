@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#11140f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Zakup Jora">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Zakup Jora</title>
+<style>
+html,body{margin:0;height:100%;background:#11140f;color:#b9ff59;font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+body{display:grid;place-items:center}
+.loader{text-align:center}
+.loader b{display:grid;place-items:center;width:62px;height:62px;margin:auto;border-radius:20px;background:#1d221a;font:700 35px Georgia}
+.loader span{display:block;margin-top:12px;color:#fff;font-size:12px}
+</style>
+</head>
+<body>
+<div class="loader"><b>J</b><span>Открываем Zakup Jora…</span></div>
+<script>
+(async()=>{
+  const names=["part1.txt", "part2.txt", "part3.txt"];
+  const chunks=await Promise.all(names.map(name=>fetch(name).then(response=>{
+    if(!response.ok)throw new Error(name);
+    return response.text();
+  })));
+  const binary=atob(chunks.join("").replace(/\s/g,""));
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  const html=await new Response(
+    new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))
+  ).text();
+  document.open();
+  document.write(html);
+  document.close();
+})().catch(()=>{
+  document.body.innerHTML='<div class="loader"><b>J</b><span>Обновите страницу при наличии интернета</span></div>';
+});
+</script>
+</body>
+</html>
