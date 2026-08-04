@@ -1,0 +1,15 @@
+{
+  "name": "Fruktodar AI — умная закупка",
+  "short_name": "Fruktodar AI",
+  "description": "Голосовой помощник закупщика, кружки, базы, подсчёт и ценники 58×40 мм.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b0f0b",
+  "theme_color": "#0d120d",
+  "lang": "ru",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
