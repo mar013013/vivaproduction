@@ -1,6 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="120" fill="#0d120d"/>
-  <path d="M123 125c0-34 27-61 61-61h144c34 0 61 27 61 61v262c0 34-27 61-61 61H184c-34 0-61-27-61-61V125Z" fill="#b8ff58"/>
-  <path d="M190 164h142v54h-82v52h72v52h-72v95h-60V164Z" fill="#0d120d"/>
-  <circle cx="382" cy="116" r="42" fill="#ff5d58" stroke="#0d120d" stroke-width="18"/>
+  <defs>
+    <linearGradient id="o" x1="80" y1="60" x2="430" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ff9e32"/><stop offset="1" stop-color="#ff6811"/>
+    </linearGradient>
+    <linearGradient id="g" x1="340" y1="50" x2="460" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8fd36d"/><stop offset="1" stop-color="#4c9b45"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="132" fill="#fff8ef"/>
+  <rect x="76" y="84" width="356" height="356" rx="112" fill="url(#o)" transform="rotate(-4 254 262)"/>
+  <path d="M206 164h139v55h-76v50h67v53h-67v102h-63V164Z" fill="white"/>
+  <path d="M349 72c56-13 91 15 101 65-51 14-91-6-101-65Z" fill="url(#g)" stroke="#fff8ef" stroke-width="16"/>
 </svg>
