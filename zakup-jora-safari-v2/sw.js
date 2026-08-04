@@ -1,5 +1,5 @@
-const CACHE="zakup-jora-safari-live-v3";
-const FILES=["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./part1.txt", "./part2.txt", "./part3.txt"];
+const CACHE="zakup-jora-safari-live-v4";
+const FILES=["./index.html", "./manifest.webmanifest", "./icon.svg", "./part1.txt", "./part2.txt", "./part3.txt"];
 self.addEventListener("install",event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",event=>{
