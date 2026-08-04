@@ -6,10 +6,15 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0b0f0b",
-  "theme_color": "#0d120d",
+  "background_color": "#fff8ef",
+  "theme_color": "#ff7a18",
   "lang": "ru",
   "icons": [
-    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
   ]
 }
