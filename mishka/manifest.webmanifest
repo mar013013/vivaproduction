@@ -1,0 +1,15 @@
+{
+  "name": "Мишка рядом",
+  "short_name": "Мишка",
+  "description": "Городская карта-игра с пользовательскими метками виртуальных мишек.",
+  "lang": "ru",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#12100d",
+  "theme_color": "#12100d",
+  "icons": [
+    {"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
