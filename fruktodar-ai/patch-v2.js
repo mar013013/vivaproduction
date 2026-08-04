@@ -7,14 +7,29 @@ const FRUKTODAR_SUPPLIER_PRESENTATION = {
   'Не распределено': { color: 'red', emoji: '⚪' }
 };
 
+const FRUKTODAR_COLOR_TO_SUPPLIER = {
+  red: 'Яма',
+  green: 'Хутор',
+  yellow: 'Гарант'
+};
+
 const FRUKTODAR_DEFAULT_SUPPLIER_KEYWORDS = {
   'Яма': [
     'картоф*', 'лук', 'кабач*', 'огур*', 'помидор*', 'томат*',
     'яблок*', 'слив*', 'чернослив*', 'череш*', 'голубик*', 'малин*',
-    'ежевик*', 'тутовник*', 'шелковиц*', 'смородин*', 'инжир*', 'клубник*'
+    'ежевик*', 'тутовник*', 'шелковиц*', 'смородин*', 'инжир*', 'клубник*',
+    'чеснок*', 'гриб*', 'капуст*', 'морков*', 'свекл*', 'редьк*', 'редис*',
+    'баклажан*', 'кукуруз*', 'зелень*', 'укроп*', 'петруш*', 'кинз*'
   ],
-  'Хутор': ['авокадо*', 'груш*', 'персик*', 'нектарин*'],
-  'Гарант': ['пакет*', 'milka*', 'kitkat*', 'kit kat*']
+  'Хутор': [
+    'авокадо*', 'груш*', 'персик*', 'нектарин*', 'банан*', 'виноград*',
+    'апельсин*', 'мандарин*', 'лимон*', 'грейпфрут*', 'киви*', 'манго*',
+    'маракуй*', 'питахай*', 'гранадилл*', 'мангустин*', 'рамбутан*', 'лонган*'
+  ],
+  'Гарант': [
+    'пакет*', 'milka*', 'kitkat*', 'kit kat*', 'кофе*', 'mehmet*', 'эфенди*',
+    'вода*', 'cola*', 'кола*', 'энергетик*', 'напиток*', 'шоколад*'
+  ]
 };
 
 function fruktodarContainsKeyword(normalizedText, keyword) {
@@ -57,6 +72,88 @@ function fruktodarQuantityMetadata(text, patterns) {
   return { quantityValue: null, quantityUnit: '' };
 }
 
+function fruktodarCanonicalVoiceColor(value = '') {
+  const text = normalize(value);
+  if (text.startsWith('красн')) return 'red';
+  if (text.startsWith('зелен') || text.startsWith('зелён')) return 'green';
+  if (text.startsWith('желт') || text.startsWith('жёлт')) return 'yellow';
+  return null;
+}
+
+function fruktodarVoiceMarker(color) {
+  return `__fruktodar_${color}__`;
+}
+
+function fruktodarSplitVoiceLine(line) {
+  const source = line.replace(/\s+/g, ' ').trim();
+  if (!source) return [];
+
+  const colorRegex = /\b(?:это|эта|ето)\s+(красн(?:ый|ая|ое|ым|ого)|зел[её]н(?:ый|ая|ое|ым|ого)|ж[её]лт(?:ый|ая|ое|ым|ого))\b/gi;
+  const result = [];
+  let cursor = 0;
+  let match;
+
+  while ((match = colorRegex.exec(source)) !== null) {
+    const itemText = fruktodarCleanNote(source.slice(cursor, match.index));
+    const color = fruktodarCanonicalVoiceColor(match[1]);
+    if (itemText && color) result.push(`${fruktodarVoiceMarker(color)} ${itemText}`);
+    cursor = colorRegex.lastIndex;
+  }
+
+  const tail = fruktodarCleanNote(source.slice(cursor));
+  if (result.length) {
+    if (tail) {
+      const tailParts = tail.split(/\s+(?:это|эта|ето)\s+/i).map(fruktodarCleanNote).filter(Boolean);
+      result.push(...tailParts);
+    }
+    return result;
+  }
+
+  const bareParts = source
+    .split(/\s+(?:это|эта|ето)\s+/i)
+    .map(fruktodarCleanNote)
+    .filter(Boolean);
+
+  return bareParts.length > 1 ? bareParts : [source];
+}
+
+function fruktodarPrepareVoiceLines(raw) {
+  const normalizedRaw = raw
+    .replace(/\r/g, '\n')
+    .replace(/[•▪◦]/g, '\n')
+    .replace(/([.!?])\s+(?=[А-ЯA-ZЁ])/g, '$1\n');
+
+  const lines = [];
+  for (const rawLine of normalizedRaw.split(/\n+/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    lines.push(...fruktodarSplitVoiceLine(line));
+  }
+  return lines;
+}
+
+function fruktodarMarkerColor(text = '') {
+  const sentinel = text.match(/__fruktodar_(red|green|yellow)__/i);
+  if (sentinel) return sentinel[1].toLowerCase();
+
+  const trimmed = text.trim();
+  if (trimmed.startsWith('🔴')) return 'red';
+  if (trimmed.startsWith('🟢')) return 'green';
+  if (trimmed.startsWith('🟡')) return 'yellow';
+
+  const leading = normalize(trimmed).match(/^(красн\w*|зел[её]н\w*|ж[её]лт\w*)\b/);
+  return leading ? fruktodarCanonicalVoiceColor(leading[1]) : null;
+}
+
+function fruktodarRemoveColorMarker(text = '') {
+  return text
+    .replace(/__fruktodar_(?:red|green|yellow)__/ig, ' ')
+    .replace(/^\s*[🔴🟢🟡]\s*/, '')
+    .replace(/^\s*(?:красн(?:ый|ая|ое)|зел[её]н(?:ый|ая|ое)|ж[её]лт(?:ый|ая|ое))(?:\s+кружок)?\s*[:—–-]?\s*/i, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 splitProductSegments = function patchedSplitProductSegments(line) {
   if (/[—–]|\s-\s/.test(line)) return [line];
   const protectedLine = line.replace(/(\d)[,.](\d)/g, '$1§$2');
@@ -95,7 +192,7 @@ extractProductDetails = function patchedExtractProductDetails(segment) {
   const quantityPatterns = [
     /(\d+(?:[.,]\d+)?)\s*(кг|килограмм\w*|г|грамм\w*|ящик\w*|коробк\w*|мешк\w*|лукошк\w*|связк\w*|шт\.?|штук\w*|упаковк\w*|пачк\w*)\b/i,
     /\b(?:x|х)\s*(\d+)\b/i,
-    /\b(один|одна|одно|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять)\s+(ящик\w*|коробк\w*|мешк\w*|лукошк\w*|связк\w*|штук\w*|килограмм\w*)\b/i
+    /\b(один|одна|одно|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять|пол|половина)\s+(ящик\w*|коробк\w*|мешк\w*|лукошк\w*|связк\w*|штук\w*|килограмм\w*|упаковк\w*|пакет\w*)\b/i
   ];
 
   if (quantity) {
@@ -130,13 +227,7 @@ parsePurchaseText = function patchedParsePurchaseText(raw, fallbackColor) {
   const defaultColor = fallbackColor || 'red';
   const out = [];
 
-  const cleaned = raw
-    .replace(/\r/g, '\n')
-    .replace(/[•▪◦]/g, '\n')
-    .replace(/\s+-\s+/g, ' — ')
-    .replace(/([.!?])\s+(?=[А-ЯA-ZЁ])/g, '$1\n');
-
-  const lines = cleaned.split(/\n+/).map((x) => x.trim()).filter(Boolean);
+  const lines = fruktodarPrepareVoiceLines(raw);
 
   for (const sourceLine of lines) {
     let line = sourceLine;
@@ -146,10 +237,11 @@ parsePurchaseText = function patchedParsePurchaseText(raw, fallbackColor) {
       currentColor = null;
       line = removeSupplierWords(line, supplierAliases);
     }
-    const explicitColor = detectColor(line);
-    if (explicitColor) {
-      currentColor = explicitColor;
-      line = removeColorWords(line);
+
+    const lineMarkerColor = fruktodarMarkerColor(line);
+    if (lineMarkerColor) {
+      currentColor = lineMarkerColor;
+      line = fruktodarRemoveColorMarker(line);
     }
 
     const segments = splitProductSegments(line);
@@ -157,18 +249,26 @@ parsePurchaseText = function patchedParsePurchaseText(raw, fallbackColor) {
       segment = segment.replace(/^[:;,\-–—\s]+|[:;,\-–—\s]+$/g, '').trim();
       if (!segment || isOnlyContext(segment, supplierAliases)) continue;
 
-      const explicitItemColor = detectColor(segment);
-      const segmentSupplier = detectSupplier(segment, supplierAliases) || currentSupplier;
-      segment = removeSupplierWords(removeColorWords(segment), supplierAliases).trim();
+      const explicitItemColor = fruktodarMarkerColor(segment) || lineMarkerColor;
+      const explicitSegmentSupplier = detectSupplier(segment, supplierAliases);
+      segment = removeSupplierWords(fruktodarRemoveColorMarker(segment), supplierAliases).trim();
 
       const extracted = extractProductDetails(segment);
       if (!extracted.name || extracted.name.length < 2) continue;
+
       const rememberedSupplier = findRememberedSupplier(extracted.name);
       const defaultSupplier = fruktodarDefaultSupplier(extracted.name);
-      const supplier = segmentSupplier !== 'Не распределено'
-        ? segmentSupplier
-        : (rememberedSupplier || defaultSupplier || segmentSupplier);
-      const itemColor = explicitItemColor || currentColor || fruktodarColorForSupplier(supplier) || defaultColor;
+      const colorSupplier = explicitItemColor ? FRUKTODAR_COLOR_TO_SUPPLIER[explicitItemColor] : null;
+      const supplier = explicitSegmentSupplier
+        || colorSupplier
+        || (currentSupplier !== 'Не распределено' ? currentSupplier : null)
+        || rememberedSupplier
+        || defaultSupplier
+        || 'Не распределено';
+      const itemColor = explicitItemColor
+        || currentColor
+        || fruktodarColorForSupplier(supplier)
+        || defaultColor;
 
       out.push({
         id: uid(),
