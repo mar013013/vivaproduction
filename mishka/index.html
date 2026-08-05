@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
@@ -11,93 +11,60 @@
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="apple-touch-icon" href="./icon.svg" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
-  <link rel="stylesheet" href="./app.css?v=5" />
+  <link rel="stylesheet" href="./app.css?v=6" />
   <title>Мишка рядом</title>
 </head>
 <body>
   <main id="app">
     <header class="topbar glass">
-      <div class="brand">
-        <div class="brand-mark">🐻</div>
-        <div><strong>Мишка рядом</strong><span id="onlineStatus">демо-режим</span></div>
-      </div>
-      <button id="profileButton" class="icon-button" aria-label="Профиль">👤</button>
+      <div class="brand"><div class="brand-mark">🐻</div><div><strong>Мишка рядом</strong><span id="onlineStatus">демо-режим</span></div></div>
+      <div class="header-actions"><button id="themeButton" class="icon-button" aria-label="Сменить тему">🌙</button><button id="profileButton" class="icon-button" aria-label="Профиль">👤</button></div>
     </header>
-
     <div id="map" aria-label="Карта игровых меток"></div>
-
-    <section class="level-legend glass" aria-label="Уровни мишек">
-      <span class="legend-title">Уровни</span>
-      <span class="legend-level l1">1</span>
-      <span class="legend-level l2">2</span>
-      <span class="legend-level l3">3</span>
-      <span class="legend-level l4">4</span>
-      <span class="legend-level l5">5</span>
-    </section>
-
-    <div class="map-actions">
-      <button id="locateButton" class="round-button glass" aria-label="Моё местоположение">◎</button>
-      <button id="refreshButton" class="round-button glass" aria-label="Обновить карту">↻</button>
-    </div>
-
+    <section class="level-legend glass"><span class="legend-title">Уровни</span><span class="legend-level l1">1</span><span class="legend-level l2">2</span><span class="legend-level l3">3</span><span class="legend-level l4">4</span><span class="legend-level l5">5</span></section>
+    <div class="map-actions"><button id="locateButton" class="round-button glass">◎</button><button id="refreshButton" class="round-button glass">↻</button></div>
     <div class="map-credit">Карта © OpenStreetMap · оформление CARTO</div>
     <button id="addButton" class="primary-fab"><span>＋</span> Поставить мишку</button>
     <div id="toast" class="toast" role="status"></div>
   </main>
-
   <div id="sheetBackdrop" class="backdrop hidden"></div>
-
-  <section id="bearSheet" class="sheet hidden" aria-modal="true" role="dialog">
-    <div class="sheet-handle"></div>
-    <button class="sheet-close" data-close-sheet aria-label="Закрыть">×</button>
-    <div id="bearSheetContent"></div>
-  </section>
-
-  <section id="createSheet" class="sheet hidden" aria-modal="true" role="dialog">
-    <div class="sheet-handle"></div>
-    <button class="sheet-close" data-close-sheet aria-label="Закрыть">×</button>
-    <h2>Новый мишка</h2>
-    <p class="muted">Выбери уровень игровой метки. В демо она хранится на этом телефоне и исчезает через 45 минут.</p>
-
-    <label class="field-label">Уровень мишки</label>
-    <div id="levelSelector" class="level-selector" role="radiogroup" aria-label="Уровень мишки">
-      <button class="level-card selected" type="button" data-level="1" role="radio" aria-checked="true"><i class="level-orb l1">1</i><span><b>Обычный</b><small>Уровень 1</small></span></button>
-      <button class="level-card" type="button" data-level="2" role="radio" aria-checked="false"><i class="level-orb l2">2</i><span><b>Бронзовый</b><small>Уровень 2</small></span></button>
-      <button class="level-card" type="button" data-level="3" role="radio" aria-checked="false"><i class="level-orb l3">3</i><span><b>Серебряный</b><small>Уровень 3</small></span></button>
-      <button class="level-card" type="button" data-level="4" role="radio" aria-checked="false"><i class="level-orb l4">4</i><span><b>Золотой</b><small>Уровень 4</small></span></button>
-      <button class="level-card" type="button" data-level="5" role="radio" aria-checked="false"><i class="level-orb l5">5</i><span><b>Легендарный</b><small>Уровень 5</small></span></button>
+  <section id="bearSheet" class="sheet hidden"><div class="sheet-handle"></div><button class="sheet-close" data-close-sheet>×</button><div id="bearSheetContent"></div></section>
+  <section id="createSheet" class="sheet hidden">
+    <div class="sheet-handle"></div><button class="sheet-close" data-close-sheet>×</button>
+    <h2>Новый мишка</h2><p class="muted">Выбери игровой тип и уровень. Метка исчезнет через 45 минут.</p>
+    <label class="field-label">Тип мишки</label>
+    <div id="typeSelector" class="type-selector" role="radiogroup">
+      <button class="type-card selected" type="button" data-type="classic"><i>🐻</i><span>Обычный</span></button>
+      <button class="type-card" type="button" data-type="doctor"><i>🧑‍⚕️</i><span>Доктор</span></button>
+      <button class="type-card" type="button" data-type="rescuer"><i>🧑‍🚒</i><span>Спасатель</span></button>
+      <button class="type-card" type="button" data-type="traveler"><i>🎒</i><span>Путешественник</span></button>
+      <button class="type-card" type="button" data-type="star"><i>✨</i><span>Звёздный</span></button>
     </div>
-
+    <label class="field-label">Уровень мишки</label>
+    <div id="levelSelector" class="level-selector" role="radiogroup">
+      <button class="level-card selected" type="button" data-level="1"><i class="level-orb l1">1</i><span><b>Обычный</b><small>Уровень 1</small></span></button>
+      <button class="level-card" type="button" data-level="2"><i class="level-orb l2">2</i><span><b>Бронзовый</b><small>Уровень 2</small></span></button>
+      <button class="level-card" type="button" data-level="3"><i class="level-orb l3">3</i><span><b>Серебряный</b><small>Уровень 3</small></span></button>
+      <button class="level-card" type="button" data-level="4"><i class="level-orb l4">4</i><span><b>Золотой</b><small>Уровень 4</small></span></button>
+      <button class="level-card" type="button" data-level="5"><i class="level-orb l5">5</i><span><b>Легендарный</b><small>Уровень 5</small></span></button>
+    </div>
     <label class="field-label" for="bearNote">Комментарий <span>необязательно</span></label>
     <textarea id="bearNote" maxlength="120" placeholder="Например: мишка у входа в парк"></textarea>
     <div class="coordinate-row" id="selectedCoordinates"></div>
     <button id="confirmCreateButton" class="button primary wide">Опубликовать мишку</button>
   </section>
-
-  <section id="profileSheet" class="sheet hidden" aria-modal="true" role="dialog">
-    <div class="sheet-handle"></div>
-    <button class="sheet-close" data-close-sheet aria-label="Закрыть">×</button>
-    <h2>Профиль игрока</h2>
-    <label class="field-label" for="nicknameInput">Имя на карте</label>
-    <input id="nicknameInput" maxlength="28" autocomplete="nickname" />
-    <button id="saveProfileButton" class="button primary wide">Сохранить</button>
-    <hr />
-    <h3>Установить на iPhone</h3>
-    <p class="muted">Safari → «Поделиться» → «На экран Домой». Потом открой приложение с иконки.</p>
+  <section id="profileSheet" class="sheet hidden">
+    <div class="sheet-handle"></div><button class="sheet-close" data-close-sheet>×</button>
+    <h2>Профиль игрока</h2><label class="field-label" for="nicknameInput">Имя на карте</label><input id="nicknameInput" maxlength="28" autocomplete="nickname" /><button id="saveProfileButton" class="button primary wide">Сохранить</button>
+    <hr /><h3>Уведомления</h3>
+    <p class="muted">На iPhone сначала установи приложение через Safari → «Поделиться» → «На экран Домой» и открой его с иконки.</p>
     <button id="installButton" class="button secondary wide">Как установить</button>
-    <button id="notificationButton" class="button secondary wide">Включить и проверить уведомление</button>
-    <p id="notificationStatus" class="muted">Установи приложение на экран Домой, затем нажми эту кнопку и разреши уведомления.</p>
-    <div class="rules-card">
-      <strong>Карта обновлена</strong>
-      <p>Используется нейтральная подложка CARTO на открытых картографических данных OpenStreetMap. Спорная символика в интерфейсе отсутствует.</p>
-    </div>
-    <div class="rules-card">
-      <strong>Демонстрационная версия</strong>
-      <p>Метки сейчас сохраняются только на твоём устройстве. Общая карта между людьми и фоновые push-уведомления подключаются после размещения постоянного сервера.</p>
-    </div>
+    <button id="notificationButton" class="button secondary wide">Проверить локальное уведомление</button>
+    <p id="notificationStatus" class="muted">Уведомления от других пользователей требуют общего push-сервера и пока не подключены.</p>
+    <div class="rules-card"><strong>Ограничение голосования</strong><p>По одной метке можно проголосовать один раз в 10 минут. Сообщения в обсуждении можно писать отдельно.</p></div>
+    <div class="rules-card"><strong>Демонстрационная версия</strong><p>Метки пока хранятся только на этом устройстве. Общая карта между телефонами будет после подключения постоянной базы.</p></div>
   </section>
-
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="./app.js?v=5" defer></script>
+  <script src="./app.js?v=6" defer></script>
 </body>
 </html>
