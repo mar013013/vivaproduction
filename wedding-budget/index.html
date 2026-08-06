@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0d">
+  <meta name="description" content="Свадебный бюджет, расходы, предоплаты, покупки и гости Марата и Карины.">
+  <title>Свадьба Марат & Карина — расходы</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Основная навигация">
+      <button class="brand" data-route="dashboard" aria-label="На главную">
+        <span class="brand-mark">M<span>&</span>K</span>
+        <span class="brand-copy"><b>Марат & Карина</b><small>WEDDING CONTROL</small></span>
+      </button>
+
+      <nav class="desktop-nav">
+        <button class="nav-btn active" data-route="dashboard"><span>⌂</span><b>Обзор</b></button>
+        <button class="nav-btn" data-route="expenses"><span>₽</span><b>Расходы</b></button>
+        <button class="nav-btn" data-route="guests"><span>◉</span><b>Гости</b></button>
+        <button class="nav-btn" data-route="purchases"><span>✓</span><b>Покупки</b></button>
+        <button class="nav-btn" data-route="settings"><span>⚙</span><b>Настройки</b></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="mini-date"><small>До свадьбы</small><b id="sideCountdown">—</b></div>
+        <button class="icon-btn" id="themeToggle" aria-label="Переключить тему">☼</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow" id="pageEyebrow">СВАДЬБА • 25 АВГУСТА 2026</p>
+          <h1 id="pageTitle">Финансовый центр</h1>
+        </div>
+        <div class="top-actions">
+          <button class="button ghost compact" id="copySummaryBtn">Поделиться итогом</button>
+          <button class="button primary compact" id="headerAddBtn">＋ Добавить</button>
+        </div>
+      </header>
+
+      <div id="view" class="view" aria-live="polite"></div>
+    </main>
+
+    <nav class="mobile-nav" aria-label="Мобильная навигация">
+      <button class="mobile-nav-btn active" data-route="dashboard"><span>⌂</span><small>Обзор</small></button>
+      <button class="mobile-nav-btn" data-route="expenses"><span>₽</span><small>Расходы</small></button>
+      <button class="mobile-nav-btn mobile-add" id="mobileAddBtn" aria-label="Добавить">＋</button>
+      <button class="mobile-nav-btn" data-route="guests"><span>◉</span><small>Гости</small></button>
+      <button class="mobile-nav-btn" data-route="purchases"><span>✓</span><small>Покупки</small></button>
+    </nav>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="assertive"></div>
+  <div class="modal-root" id="modalRoot"></div>
+  <input type="file" id="importInput" accept="application/json" hidden>
+
+  <script src="app.js"></script>
+</body>
+</html>

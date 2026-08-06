@@ -1,0 +1,12 @@
+{
+  "name": "Свадьба Марат & Карина — расходы",
+  "short_name": "M&K Бюджет",
+  "description": "Свадебный бюджет, расходы, предоплаты, покупки и гости.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a0a0d",
+  "theme_color": "#0a0a0d",
+  "lang": "ru",
+  "icons": [{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
