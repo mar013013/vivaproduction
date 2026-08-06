@@ -1,8 +1,11 @@
-name: Deploy GitHub Pages
+name: Deploy Wedding Budget to GitHub Pages
 
 on:
   push:
     branches: ["main"]
+    paths:
+      - "wedding-budget/**"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -22,15 +25,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload site
-        uses: actions/upload-pages-artifact@v4
+      - name: Upload wedding budget site
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ./wedding-budget
 
       - name: Deploy to GitHub Pages
         id: deployment
