@@ -1,5 +1,5 @@
 const CACHE = 'mk-wedding-v3-premium';
-const ASSETS = ['./','index.html','v2.css','sync-bootstrap.js','app.js','app-v2.js','manifest.webmanifest','icon.svg'];
+const ASSETS = ['./','index.html','v2.css','v2-fixes.css','sync-bootstrap.js','app.js','app-v2.js','manifest.webmanifest','icon.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
