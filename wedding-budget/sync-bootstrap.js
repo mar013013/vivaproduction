@@ -9,97 +9,70 @@
 
   const nativeGet = Storage.prototype.getItem;
   const nativeSet = Storage.prototype.setItem;
-  const nativeRemove = Storage.prototype.removeItem;
   const localGet = key => nativeGet.call(localStorage, key);
   const localSet = (key, value) => nativeSet.call(localStorage, key, value);
-  const localRemove = key => nativeRemove.call(localStorage, key);
 
   const sync = {
-    room: null,
-    cryptoKey: null,
-    lastRevision: 0,
-    dirty: false,
-    pushing: false,
-    applyingRemote: false,
-    pendingRemote: false,
-    timer: null,
-    poller: null,
-    deviceId: localGet(DEVICE_KEY) || crypto.randomUUID(),
-    booted: false
+    room:null, cryptoKey:null, lastRevision:0, dirty:false, pushing:false, applyingRemote:false,
+    pendingRemote:false, timer:null, poller:null, loaded:false,
+    deviceId:localGet(DEVICE_KEY) || (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`)
   };
   localSet(DEVICE_KEY, sync.deviceId);
 
-  const bytesToBase64Url = bytes => {
+  const toBase64Url = bytes => {
     let binary = '';
     bytes.forEach(byte => { binary += String.fromCharCode(byte); });
-    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+    return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/g,'');
+  };
+  const fromBase64Url = value => {
+    const base64 = value.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(value.length / 4) * 4, '=');
+    return Uint8Array.from(atob(base64), char => char.charCodeAt(0));
   };
 
-  const base64UrlToBytes = value => {
-    const base64 = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
-    const binary = atob(base64);
-    return Uint8Array.from(binary, char => char.charCodeAt(0));
-  };
-
-  async function importRoomKey(encodedKey) {
-    return crypto.subtle.importKey(
-      'raw',
-      base64UrlToBytes(encodedKey),
-      { name: 'AES-GCM' },
-      false,
-      ['encrypt', 'decrypt']
-    );
+  async function importKey(encoded) {
+    return crypto.subtle.importKey('raw', fromBase64Url(encoded), { name:'AES-GCM' }, false, ['encrypt','decrypt']);
   }
 
-  async function encryptState(plainText, revision = Date.now()) {
+  async function encrypt(text, revision) {
     const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encoded = new TextEncoder().encode(plainText);
-    const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, sync.cryptoKey, encoded);
-    return {
-      schema: 1,
-      revision,
-      device: sync.deviceId,
-      iv: bytesToBase64Url(iv),
-      payload: bytesToBase64Url(new Uint8Array(cipher))
-    };
+    const cipher = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, sync.cryptoKey, new TextEncoder().encode(text));
+    return { schema:1, revision, device:sync.deviceId, iv:toBase64Url(iv), payload:toBase64Url(new Uint8Array(cipher)) };
   }
 
-  async function decryptState(envelope) {
-    if (!envelope || envelope.schema !== 1 || !envelope.iv || !envelope.payload) {
-      throw new Error('Неверный формат общей базы');
-    }
-    const plain = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: base64UrlToBytes(envelope.iv) },
-      sync.cryptoKey,
-      base64UrlToBytes(envelope.payload)
-    );
+  async function decrypt(envelope) {
+    if (!envelope?.iv || !envelope?.payload) throw new Error('Неверный формат общей базы');
+    const plain = await crypto.subtle.decrypt({ name:'AES-GCM', iv:fromBase64Url(envelope.iv) }, sync.cryptoKey, fromBase64Url(envelope.payload));
     return new TextDecoder().decode(plain);
   }
 
-  function readRoomFromAddress() {
+  function roomFromAddress() {
     const url = new URL(location.href);
-    const hash = new URLSearchParams(url.hash.replace(/^#/, ''));
     const id = url.searchParams.get('sync');
-    const key = hash.get('k');
-    return id && key ? { id, key } : null;
+    const key = new URLSearchParams(url.hash.replace(/^#/,'')).get('k');
+    return id && key ? { id, key, revision:0 } : null;
   }
 
-  function readSavedRoom() {
+  function savedRoom() {
     try {
-      const saved = JSON.parse(localGet(ROOM_KEY) || 'null');
-      return saved?.id && saved?.key ? saved : null;
-    } catch {
-      return null;
-    }
+      const room = JSON.parse(localGet(ROOM_KEY) || 'null');
+      return room?.id && room?.key ? { id:String(room.id), key:String(room.key), revision:Number(room.revision) || 0 } : null;
+    } catch { return null; }
   }
 
-  function saveRoom(room) {
-    sync.room = room;
-    localSet(ROOM_KEY, JSON.stringify(room));
+  function persistRoom(room = sync.room) {
+    if (!room) return;
+    sync.room = { id:room.id, key:room.key, revision:Number(room.revision ?? sync.lastRevision) || 0 };
+    sync.lastRevision = sync.room.revision;
+    localSet(ROOM_KEY, JSON.stringify(sync.room));
     const url = new URL(location.href);
-    url.searchParams.set('sync', room.id);
-    url.hash = `k=${room.key}`;
+    url.searchParams.set('sync', sync.room.id);
+    url.hash = `k=${sync.room.key}`;
     history.replaceState(null, '', url);
+  }
+
+  function rememberRevision(revision) {
+    sync.lastRevision = Number(revision) || sync.lastRevision;
+    if (sync.room) persistRoom({ ...sync.room, revision:sync.lastRevision });
   }
 
   function shareLink() {
@@ -111,17 +84,9 @@
   }
 
   function setStatus(text, mode = 'ok') {
-    const colors = {
-      ok: ['#8ee7d7', 'rgba(142,231,215,.12)'],
-      busy: ['#f0c56c', 'rgba(240,197,108,.12)'],
-      error: ['#ff7b89', 'rgba(255,123,137,.12)'],
-      local: ['#aaa6ad', 'rgba(170,166,173,.12)']
-    };
-    const [color, background] = colors[mode] || colors.ok;
     document.querySelectorAll('[data-sync-status]').forEach(node => {
       node.textContent = text;
-      node.style.color = color;
-      node.style.background = background;
+      node.dataset.mode = mode;
     });
   }
 
@@ -132,121 +97,118 @@
     toast.className = 'toast';
     toast.innerHTML = `<b>${title}</b>${text ? `<small>${text}</small>` : ''}`;
     stack.append(toast);
-    setTimeout(() => toast.remove(), 4200);
+    setTimeout(() => toast.remove(), 3800);
   }
 
-  async function createRoomFromLocal() {
+  async function fetchWithTimeout(url, options = {}, timeout = 9000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try { return await fetch(url, { ...options, signal:controller.signal }); }
+    finally { clearTimeout(timer); }
+  }
+
+  async function createRoom() {
     if (sync.room) return sync.room;
     const current = localGet(DATA_KEY);
-    if (!current) {
-      throw new Error('Сначала добавьте хотя бы одну запись, затем включите общий доступ.');
-    }
-
-    setStatus('Создаю общую базу…', 'busy');
+    if (!current) throw new Error('Сначала добавьте данные в приложение.');
+    setStatus('Создаю общую базу…','busy');
     const keyBytes = crypto.getRandomValues(new Uint8Array(32));
-    const key = bytesToBase64Url(keyBytes);
-    sync.cryptoKey = await importRoomKey(key);
+    const key = toBase64Url(keyBytes);
+    sync.cryptoKey = await importKey(key);
     const revision = Date.now();
-    const envelope = await encryptState(current, revision);
-    const response = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(envelope)
-    });
-    if (!response.ok) throw new Error(`Облачное хранилище ответило: ${response.status}`);
-
-    const locationHeader = response.headers.get('Location');
-    const id = locationHeader?.split('/').filter(Boolean).pop();
-    if (!id) throw new Error('Не удалось получить номер общей базы.');
-
-    sync.lastRevision = revision;
-    saveRoom({ id, key });
-    setStatus('Синхронизация включена', 'ok');
-    notify('Общая база создана', 'Твои текущие данные сохранены. Теперь отправь Карине общую ссылку.');
+    const envelope = await encrypt(current, revision);
+    const response = await fetchWithTimeout(API, { method:'POST', headers:{ 'Content-Type':'application/json', Accept:'application/json' }, body:JSON.stringify(envelope) });
+    if (!response.ok) throw new Error(`Сервис синхронизации: ${response.status}`);
+    const id = response.headers.get('Location')?.split('/').filter(Boolean).pop();
+    if (!id) throw new Error('Не удалось создать общую базу.');
+    sync.room = { id, key, revision };
+    persistRoom(sync.room);
+    setStatus('Сохранено у вас обоих','ok');
     startPolling();
+    notify('Общая ссылка готова','Отправь её Карине целиком.');
     return sync.room;
   }
 
   async function fetchEnvelope() {
-    if (!sync.room) return null;
-    const response = await fetch(`${API}/${encodeURIComponent(sync.room.id)}`, {
-      headers: { 'Accept': 'application/json' },
-      cache: 'no-store'
-    });
-    if (!response.ok) throw new Error(`Не удалось получить общие данные: ${response.status}`);
+    const response = await fetchWithTimeout(`${API}/${encodeURIComponent(sync.room.id)}`, { headers:{ Accept:'application/json' }, cache:'no-store' });
+    if (!response.ok) throw new Error(`Не удалось получить данные: ${response.status}`);
     return response.json();
   }
 
-  async function pullRemote({ initial = false } = {}) {
+  async function pullRemote() {
     if (!sync.room || sync.pushing || sync.dirty) return;
     try {
-      if (!sync.cryptoKey) sync.cryptoKey = await importRoomKey(sync.room.key);
+      if (!sync.cryptoKey) sync.cryptoKey = await importKey(sync.room.key);
       const envelope = await fetchEnvelope();
       const revision = Number(envelope?.revision) || 0;
-      if (!revision || revision <= sync.lastRevision) {
-        if (!initial) setStatus('Всё синхронизировано', 'ok');
-        return;
-      }
-
-      const remoteText = await decryptState(envelope);
+      if (!revision || revision <= sync.lastRevision) { setStatus('Всё синхронизировано','ok'); return; }
+      const remoteText = await decrypt(envelope);
       JSON.parse(remoteText);
       sync.applyingRemote = true;
       localSet(DATA_KEY, remoteText);
       sync.applyingRemote = false;
-      sync.lastRevision = revision;
-
-      if (initial) {
-        setStatus('Общие данные загружены', 'ok');
-        return;
-      }
-
-      if (document.querySelector('.modal-root:not(:empty), form:focus-within')) {
-        sync.pendingRemote = true;
-        setStatus('Получены изменения — применяю…', 'busy');
-      } else {
-        setStatus('Получены новые изменения', 'ok');
-        location.reload();
-      }
+      rememberRevision(revision);
+      setStatus('Получены изменения','ok');
+      if (document.querySelector('.modal-root.open,form:focus-within')) sync.pendingRemote = true;
+      else window.dispatchEvent(new CustomEvent('wedding-sync-update'));
     } catch (error) {
-      console.error('[wedding sync] pull', error);
-      setStatus('Нет связи — сохранено на телефоне', 'error');
+      console.error('[sync pull]', error);
+      setStatus('Нет связи · данные на телефоне','error');
     }
+  }
+
+  function mergeMessages(localText, remoteText) {
+    try {
+      const local = JSON.parse(localText);
+      const remote = JSON.parse(remoteText);
+      const map = new Map();
+      [...(remote.messages || []), ...(local.messages || [])].forEach(message => {
+        if (!message?.id) return;
+        const previous = map.get(message.id);
+        if (!previous || Number(message.createdAt) >= Number(previous.createdAt)) map.set(message.id, message);
+      });
+      local.messages = [...map.values()].sort((a,b) => Number(a.createdAt) - Number(b.createdAt));
+      return JSON.stringify(local);
+    } catch { return localText; }
   }
 
   async function pushLocal() {
     if (!sync.room || sync.pushing || !sync.dirty) return;
-    const current = localGet(DATA_KEY);
+    let current = localGet(DATA_KEY);
     if (!current) return;
-
     sync.pushing = true;
-    setStatus('Сохраняю изменения…', 'busy');
+    setStatus('Сохраняю…','busy');
     try {
-      if (!sync.cryptoKey) sync.cryptoKey = await importRoomKey(sync.room.key);
+      if (!sync.cryptoKey) sync.cryptoKey = await importKey(sync.room.key);
+      try {
+        const remoteEnvelope = await fetchEnvelope();
+        if (Number(remoteEnvelope?.revision) > sync.lastRevision) {
+          const remoteText = await decrypt(remoteEnvelope);
+          current = mergeMessages(current, remoteText);
+          sync.applyingRemote = true;
+          localSet(DATA_KEY, current);
+          sync.applyingRemote = false;
+        }
+      } catch (mergeError) { console.warn('[sync merge]', mergeError); }
       const revision = Math.max(Date.now(), sync.lastRevision + 1);
-      const envelope = await encryptState(current, revision);
-      const response = await fetch(`${API}/${encodeURIComponent(sync.room.id)}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(envelope)
-      });
-      if (!response.ok) throw new Error(`Облачное хранилище ответило: ${response.status}`);
-      sync.lastRevision = revision;
+      const envelope = await encrypt(current, revision);
+      const response = await fetchWithTimeout(`${API}/${encodeURIComponent(sync.room.id)}`, { method:'PUT', headers:{ 'Content-Type':'application/json', Accept:'application/json' }, body:JSON.stringify(envelope) });
+      if (!response.ok) throw new Error(`Сервис синхронизации: ${response.status}`);
       sync.dirty = false;
-      setStatus('Сохранено у вас обоих', 'ok');
+      rememberRevision(revision);
+      setStatus('Сохранено у вас обоих','ok');
     } catch (error) {
-      console.error('[wedding sync] push', error);
-      setStatus('Нет связи — повторю сохранение', 'error');
-    } finally {
-      sync.pushing = false;
-    }
+      console.error('[sync push]', error);
+      setStatus('Нет связи · повторю позже','error');
+    } finally { sync.pushing = false; }
   }
 
   function schedulePush() {
     if (!sync.room || sync.applyingRemote) return;
     sync.dirty = true;
-    setStatus('Есть несохранённые изменения…', 'busy');
+    setStatus('Есть изменения…','busy');
     clearTimeout(sync.timer);
-    sync.timer = setTimeout(pushLocal, 700);
+    sync.timer = setTimeout(pushLocal, 650);
   }
 
   function installStorageHook() {
@@ -260,118 +222,81 @@
   function startPolling() {
     clearInterval(sync.poller);
     sync.poller = setInterval(() => {
-      if (sync.pendingRemote && !document.querySelector('.modal-root:not(:empty), form:focus-within')) {
-        location.reload();
-        return;
-      }
-      if (sync.dirty && !sync.pushing) pushLocal();
+      if (sync.pendingRemote && !document.querySelector('.modal-root.open,form:focus-within')) {
+        sync.pendingRemote = false;
+        window.dispatchEvent(new CustomEvent('wedding-sync-update'));
+      } else if (sync.dirty && !sync.pushing) pushLocal();
       else if (document.visibilityState === 'visible') pullRemote();
     }, POLL_MS);
-    window.addEventListener('focus', () => pullRemote());
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') pullRemote();
-    });
   }
 
-  async function copyOrShare() {
+  async function share() {
     try {
-      if (!sync.room) await createRoomFromLocal();
+      if (!sync.room) await createRoom();
       const url = shareLink();
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Свадебные расходы — Марат и Карина',
-          text: 'Открой нашу общую таблицу свадебных расходов. Все изменения синхронизируются.',
-          url
-        });
-      } else {
-        await navigator.clipboard.writeText(url);
-        notify('Ссылка скопирована', 'Отправь её Карине. Открывать нужно полную ссылку целиком.');
-      }
+      if (navigator.share) await navigator.share({ title:'Свадьба — Марат и Карина', text:'Наша общая свадьба: бюджет, гости, покупки и чат.', url });
+      else { await navigator.clipboard.writeText(url); notify('Ссылка скопирована','Отправь её Карине целиком.'); }
     } catch (error) {
       if (error?.name === 'AbortError') return;
-      console.error('[wedding sync] share', error);
-      notify('Не удалось включить общий доступ', error.message || 'Проверь интернет и попробуй ещё раз.');
-      setStatus('Общий доступ не включён', 'error');
+      console.error('[sync share]', error);
+      notify('Не удалось поделиться', error.message || 'Проверь интернет.');
     }
   }
 
-  function injectSyncControls() {
-    const style = document.createElement('style');
-    style.textContent = `
-      .sync-share-btn{white-space:nowrap}
-      #syncDock{position:fixed;right:14px;bottom:calc(90px + env(safe-area-inset-bottom));z-index:55;display:none;align-items:center;gap:8px;padding:8px;border:1px solid var(--line2);border-radius:18px;background:rgba(15,15,20,.88);backdrop-filter:blur(22px);box-shadow:var(--shadow)}
-      :root[data-theme="light"] #syncDock{background:rgba(255,255,255,.9)}
-      #syncDock button{border:0;border-radius:12px;background:linear-gradient(135deg,#f0c1a1,#c89673);color:#211713;padding:10px 12px;font-size:11px;font-weight:800}
-      [data-sync-status]{display:inline-flex;align-items:center;border-radius:999px;padding:6px 9px;font-size:9px;font-weight:800;white-space:nowrap}
-      @media(max-width:760px){#syncDock{display:flex}.top-actions .sync-share-btn,.top-actions [data-sync-status]{display:none}}
-    `;
-    document.head.append(style);
-
-    const topActions = document.querySelector('.top-actions');
-    if (topActions) {
+  function injectControls() {
+    if (document.querySelector('.sync-share-btn')) return;
+    const top = document.querySelector('.top-actions');
+    if (top) {
       const status = document.createElement('span');
       status.dataset.syncStatus = '';
-      topActions.prepend(status);
       const button = document.createElement('button');
-      button.className = 'button secondary compact sync-share-btn';
-      button.textContent = '↗ Карине';
-      button.addEventListener('click', copyOrShare);
-      topActions.prepend(button);
+      button.className = 'primary-button sync-share-btn';
+      button.textContent = 'Карине';
+      button.addEventListener('click', share);
+      top.prepend(button);
+      top.prepend(status);
     }
-
     const dock = document.createElement('div');
     dock.id = 'syncDock';
-    dock.innerHTML = '<span data-sync-status></span><button type="button">↗ Карине</button>';
-    dock.querySelector('button').addEventListener('click', copyOrShare);
+    dock.style.cssText = 'position:fixed;right:12px;bottom:92px;z-index:70;display:none;align-items:center;gap:7px;padding:7px;border-radius:17px;backdrop-filter:blur(25px)';
+    dock.innerHTML = '<span data-sync-status></span><button type="button">Карине</button>';
+    dock.querySelector('button').addEventListener('click', share);
     document.body.append(dock);
-
-    if (sync.room) setStatus('Общая база', 'ok');
-    else setStatus('Только на этом телефоне', 'local');
+    setStatus(sync.room ? 'Общая база' : 'Только на этом телефоне', sync.room ? 'ok' : 'local');
   }
 
   function loadApplication() {
+    if (sync.loaded) return;
+    sync.loaded = true;
     const script = document.createElement('script');
-    script.src = `app.js?v=2`;
-    script.onload = () => {
-      sync.booted = true;
-      injectSyncControls();
-      if (sync.room) startPolling();
-    };
-    script.onerror = () => setStatus('Не удалось загрузить приложение', 'error');
+    script.src = 'app-v3.js?v=1';
+    script.onload = injectControls;
+    script.onerror = () => notify('Не удалось загрузить приложение','Обнови страницу ещё раз.');
     document.body.append(script);
   }
 
-  async function boot() {
-    installStorageHook();
-    const addressRoom = readRoomFromAddress();
-    const savedRoom = readSavedRoom();
-    const room = addressRoom || savedRoom;
-
-    if (room) {
-      saveRoom(room);
-      sync.cryptoKey = await importRoomKey(room.key);
-      try {
-        await pullRemote({ initial: true });
-      } catch (error) {
-        console.error('[wedding sync] initial pull', error);
-      }
-      loadApplication();
-      return;
+  async function initialiseNetwork() {
+    if (!sync.room) return;
+    try {
+      sync.cryptoKey = await importKey(sync.room.key);
+      startPolling();
+      await pullRemote();
+    } catch (error) {
+      console.error('[sync init]', error);
+      setStatus('Нет связи · данные на телефоне','error');
     }
-
-    const existingData = localGet(DATA_KEY);
-    if (existingData) {
-      try {
-        await createRoomFromLocal();
-      } catch (error) {
-        console.error('[wedding sync] auto migration', error);
-      }
-    }
-    loadApplication();
   }
 
-  boot().catch(error => {
-    console.error('[wedding sync] boot', error);
+  function boot() {
+    installStorageHook();
+    const address = roomFromAddress();
+    const saved = savedRoom();
+    const room = address ? { ...address, revision:saved?.id === address.id && saved?.key === address.key ? saved.revision : 0 } : saved;
+    if (room) persistRoom(room);
     loadApplication();
-  });
+    initialiseNetwork();
+  }
+
+  window.WeddingSync = { share, pull:pullRemote, getLink:shareLink, isShared:() => Boolean(sync.room) };
+  boot();
 })();
