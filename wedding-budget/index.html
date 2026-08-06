@@ -3,66 +3,62 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0a0a0d">
-  <meta name="description" content="Свадебный бюджет, расходы, предоплаты, покупки и гости Марата и Карины.">
-  <title>Свадьба Марат & Карина — расходы</title>
+  <meta name="theme-color" content="#09080d">
+  <meta name="description" content="Общий свадебный бюджет, расходы, семьи гостей и покупки Марата и Карины.">
+  <title>Свадебный бюджет — Марат & Карина</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="v2.css?v=1">
+  <link rel="stylesheet" href="v2-fixes.css?v=1">
 </head>
 <body>
-  <div class="ambient ambient-a"></div>
-  <div class="ambient ambient-b"></div>
+  <div class="scene"><i class="orb one"></i><i class="orb two"></i><i class="orb three"></i></div>
 
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Основная навигация">
-      <button class="brand" data-route="dashboard" aria-label="На главную">
-        <span class="brand-mark">M<span>&</span>K</span>
-        <span class="brand-copy"><b>Марат & Карина</b><small>WEDDING CONTROL</small></span>
+  <div class="app">
+    <aside class="rail">
+      <button class="identity" data-route="dashboard">
+        <span class="monogram">M&K</span>
+        <span class="identity-copy"><strong>Марат & Карина</strong><span>WEDDING CONTROL</span></span>
       </button>
 
-      <nav class="desktop-nav">
-        <button class="nav-btn active" data-route="dashboard"><span>⌂</span><b>Обзор</b></button>
-        <button class="nav-btn" data-route="expenses"><span>₽</span><b>Расходы</b></button>
-        <button class="nav-btn" data-route="guests"><span>◉</span><b>Гости</b></button>
-        <button class="nav-btn" data-route="purchases"><span>✓</span><b>Покупки</b></button>
-        <button class="nav-btn" data-route="settings"><span>⚙</span><b>Настройки</b></button>
+      <nav class="nav" aria-label="Разделы">
+        <button class="nav-button active" data-route="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-6h6v6"/></svg><span>Главная</span></button>
+        <button class="nav-button" data-route="expenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H19v16H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 7h15"/><path d="M15 11h6v5h-6a2.5 2.5 0 0 1 0-5Z"/></svg><span>Расходы</span></button>
+        <button class="nav-button" data-route="guests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg><span>Гости</span></button>
+        <button class="nav-button" data-route="purchases"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Покупки</span></button>
       </nav>
 
-      <div class="sidebar-footer">
-        <div class="mini-date"><small>До свадьбы</small><b id="sideCountdown">—</b></div>
-        <button class="icon-btn" id="themeToggle" aria-label="Переключить тему">☼</button>
+      <div class="rail-bottom">
+        <div class="date-pill"><small>ДО СВАДЬБЫ</small><b id="railCountdown">—</b></div>
+        <button class="mini-action" id="settingsButton"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg>Настройки</button>
       </div>
     </aside>
 
     <main class="main">
       <header class="topbar">
-        <div>
-          <p class="eyebrow" id="pageEyebrow">СВАДЬБА • 25 АВГУСТА 2026</p>
-          <h1 id="pageTitle">Финансовый центр</h1>
-        </div>
+        <div class="headline"><small id="pageKicker">СВАДЬБА МАРАТА И КАРИНЫ</small><h1 id="pageTitle">Главный экран</h1></div>
         <div class="top-actions">
-          <button class="button ghost compact" id="copySummaryBtn">Поделиться итогом</button>
-          <button class="button primary compact" id="headerAddBtn">＋ Добавить</button>
+          <button class="icon-action" data-route="settings" aria-label="Настройки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/></svg></button>
+          <button class="primary-action" id="headerAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>Добавить</button>
         </div>
       </header>
-
       <div id="view" class="view" aria-live="polite"></div>
     </main>
 
-    <nav class="mobile-nav" aria-label="Мобильная навигация">
-      <button class="mobile-nav-btn active" data-route="dashboard"><span>⌂</span><small>Обзор</small></button>
-      <button class="mobile-nav-btn" data-route="expenses"><span>₽</span><small>Расходы</small></button>
-      <button class="mobile-nav-btn mobile-add" id="mobileAddBtn" aria-label="Добавить">＋</button>
-      <button class="mobile-nav-btn" data-route="guests"><span>◉</span><small>Гости</small></button>
-      <button class="mobile-nav-btn" data-route="purchases"><span>✓</span><small>Покупки</small></button>
+    <nav class="mobile-nav" aria-label="Мобильные разделы">
+      <button class="active" data-mobile-route="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/></svg><small>Главная</small></button>
+      <button data-mobile-route="expenses"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/></svg><small>Расходы</small></button>
+      <button class="mobile-add" id="mobileAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button data-mobile-route="guests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="7" r="4"/><path d="M2 21a7 7 0 0 1 14 0M17 8a3 3 0 0 1 0 6M22 21a5 5 0 0 0-4-4.58"/></svg><small>Гости</small></button>
+      <button data-mobile-route="purchases"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><small>Покупки</small></button>
     </nav>
   </div>
 
+  <button hidden data-action="quick-add"></button>
   <div class="toast-stack" id="toastStack" aria-live="assertive"></div>
   <div class="modal-root" id="modalRoot"></div>
   <input type="file" id="importInput" accept="application/json" hidden>
 
-  <script src="sync-bootstrap.js?v=2"></script>
+  <script src="sync-bootstrap.js?v=3"></script>
 </body>
 </html>

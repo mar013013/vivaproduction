@@ -1,5 +1,5 @@
-const CACHE = 'mk-wedding-v2';
-const ASSETS = ['./','index.html','styles.css','sync-bootstrap.js','app.js','manifest.webmanifest','icon.svg'];
+const CACHE = 'mk-wedding-v3-premium';
+const ASSETS = ['./','index.html','v2.css','v2-fixes.css','sync-bootstrap.js','app.js','app-v2.js','manifest.webmanifest','icon.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -17,7 +17,6 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
-
   event.respondWith(
     fetch(event.request)
       .then(response => {
