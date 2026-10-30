@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'wedding-budget/**'
+      - 'central-bank/**'
       - '.github/workflows/deploy-wedding-budget.yml'
   workflow_dispatch:
 
@@ -28,10 +29,17 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure Pages
         uses: actions/configure-pages@v5
-      - name: Upload wedding budget site
+      - name: Prepare both applications
+        run: |
+          mkdir -p _site/central-bank
+          cp -a wedding-budget/. _site/
+          cp -a central-bank/. _site/central-bank/
+          python3 central-bank/export.py _site/central-bank/central-bank.html
+
+      - name: Upload applications
         uses: actions/upload-pages-artifact@v3
         with:
-          path: wedding-budget
+          path: _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
