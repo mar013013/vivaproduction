@@ -6,9 +6,9 @@ root = Path(__file__).resolve().parent
 output = Path(sys.argv[1]) if len(sys.argv) > 1 else Path('/tmp/central-bank.html')
 page = (root / 'index.html').read_text()
 for asset in ['services.css', 'experience.css', 'features.css']:
-    page = page.replace(f'<link rel="stylesheet" href="{asset}?v=5">', '<style>' + (root / asset).read_text() + '</style>')
+    page = page.replace(f'<link rel="stylesheet" href="{asset}?v=6">', '<style>' + (root / asset).read_text() + '</style>')
 for asset in ['vendor/jsQR.js', 'vendor/qrcode.js', 'app.js', 'features.js']:
-    page = page.replace(f'<script src="{asset}?v=5"></script>', '<script>' + (root / asset).read_text() + '</script>')
+    page = page.replace(f'<script src="{asset}?v=6"></script>', '<script>' + (root / asset).read_text() + '</script>')
 output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(page)
 print(f'Exported: {output} ({output.stat().st_size} bytes)')
