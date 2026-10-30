@@ -3,7 +3,7 @@
   "name": "C Bank",
   "short_name": "C Bank",
   "lang": "ru",
-  "start_url": "./?v=10#overview",
+  "start_url": "./?v=11#overview",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f7f7f8",

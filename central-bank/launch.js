@@ -1,34 +1,28 @@
 'use strict';
 (() => {
-  const screen = document.getElementById('welcomeScreen');
-  let closeTimer, exitTimer, wasHidden = false;
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  function clearTimers() { clearTimeout(closeTimer); clearTimeout(exitTimer); }
-  function finish() {
-    clearTimers();
-    if (!screen.open) return;
-    screen.classList.add('is-leaving');
-    exitTimer = setTimeout(() => { screen.close(); screen.classList.remove('is-leaving'); }, reducedMotion.matches ? 0 : 280);
-  }
-  function welcome() {
-    clearTimers();
-    screen.classList.remove('is-leaving');
-    // Re-enter the top layer so the welcome screen also covers an unfinished form on resume.
-    if (screen.open) screen.close();
-    screen.showModal();
-    closeTimer = setTimeout(finish, reducedMotion.matches ? 350 : 1700);
-  }
-  screen.querySelector('button').addEventListener('click', finish);
-  screen.addEventListener('cancel', e => { e.preventDefault(); finish(); });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { wasHidden = true; clearTimers(); if (screen.open) screen.close(); }
-    else if (wasHidden) { wasHidden = false; welcome(); }
-  });
-  window.addEventListener('pageshow', e => { if (e.persisted) welcome(); });
-  window.addEventListener('pagehide', () => { clearTimers(); if (screen.open) screen.close(); });
-  // Prevent pinch and double-tap zoom without blocking single-finger vertical or horizontal scrolling.
-  for (const type of ['gesturestart', 'gesturechange']) document.addEventListener(type, e => e.preventDefault(), { passive: false });
-  document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
-  document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
-  welcome();
+  const screen=document.getElementById('welcomeScreen'),lockKey='cbank-device-lock-v1';
+  let timer,exitTimer,wasHidden=false,pending=false,authorized=false;
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  const encode=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const decode=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+  const random=()=>crypto.getRandomValues(new Uint8Array(32));
+  function config(){try{const c=JSON.parse(localStorage.getItem(lockKey));return c&&c.version===1?c:null}catch{return null}}
+  function message(text){document.getElementById('welcomeAuthMessage').textContent=text}
+  function clear(){clearTimeout(timer);clearTimeout(exitTimer)}
+  function finish(){if(config()&&!authorized)return;clear();screen.classList.add('is-leaving');exitTimer=setTimeout(()=>{screen.close();screen.classList.remove('is-leaving')},reduced.matches?0:280)}
+  function showControls(){const locked=Boolean(config())&&!authorized;document.getElementById('welcomeAuth').hidden=!locked;screen.querySelector('.welcome-skip').hidden=locked;screen.classList.toggle('auth-locked',locked);}
+  function verifyClient(response,challenge,type){const data=JSON.parse(new TextDecoder().decode(response.clientDataJSON));if(data.type!==type||data.challenge!==encode(challenge)||data.origin!==location.origin||data.crossOrigin)throw Error('Проверка ключа доступа не пройдена.');}
+  async function verifyAuthenticator(data){const a=new Uint8Array(data),hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(location.hostname)));if(a.length<37||!hash.every((v,i)=>v===a[i])||(a[32]&5)!==5)throw Error('Не подтверждена системная проверка владельца устройства.');}
+  function signatureRaw(der){const bytes=new Uint8Array(der);let i=0;if(bytes[i++]!==48)throw Error('Неизвестная подпись.');let length=bytes[i++];if(length&128){const count=length&127;if(count>2)throw Error('Неизвестная подпись.');i+=count}const out=new Uint8Array(64);for(let part=0;part<2;part++){if(bytes[i++]!==2)throw Error('Неизвестная подпись.');let size=bytes[i++];if(size<1||size>33||i+size>bytes.length)throw Error('Неизвестная подпись.');if(size===33){if(bytes[i++]!==0)throw Error('Неизвестная подпись.');size--}out.set(bytes.slice(i,i+size),part*32+32-size);i+=size}if(i!==bytes.length)throw Error('Неизвестная подпись.');return out}
+  async function pinHash(pin,salt){const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(pin),'PBKDF2',false,['deriveBits']);return encode(await crypto.subtle.deriveBits({name:'PBKDF2',salt:decode(salt),iterations:150000,hash:'SHA-256'},material,256))}
+  async function authenticate(){const c=config();if(!c||pending)return;pending=true;screen.classList.add('auth-pending');message('Подтвердите вход на устройстве…');try{const challenge=random();const credential=await navigator.credentials.get({publicKey:{challenge,rpId:location.hostname,allowCredentials:[{id:decode(c.id),type:'public-key'}],userVerification:'required',timeout:60000}});if(!credential||encode(credential.rawId)!==c.id)throw Error('Ключ доступа не совпадает.');verifyClient(credential.response,challenge,'webauthn.get');await verifyAuthenticator(credential.response.authenticatorData);const publicKey=await crypto.subtle.importKey('spki',decode(c.publicKey),{name:'ECDSA',namedCurve:'P-256'},false,['verify']);const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',credential.response.clientDataJSON)),a=new Uint8Array(credential.response.authenticatorData),signed=new Uint8Array(a.length+hash.length);signed.set(a);signed.set(hash,a.length);const valid=await crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},publicKey,signatureRaw(credential.response.signature),signed);if(!valid)throw Error('Подпись ключа не подтверждена.');authorized=true;screen.classList.add('auth-success');message('Вход подтверждён');timer=setTimeout(finish,reduced.matches?0:450)}catch(e){message(e.name==='NotAllowedError'?'Вход отменён. Попробуйте снова или введите резервный код.':e.message||'Системный вход недоступен. Используйте резервный код.')}finally{pending=false;screen.classList.remove('auth-pending')}}
+  function welcome(){if(pending)return;clear();authorized=false;screen.classList.remove('is-leaving','auth-success');if(screen.open)screen.close();screen.showModal();showControls();message('');if(config())timer=setTimeout(authenticate,350);else timer=setTimeout(finish,reduced.matches?350:1700)}
+  window.CBankLock={enabled:()=>Boolean(config()),async enroll(pin){if(pending)throw Error('Дождитесь завершения системного подтверждения.');pending=true;try{if(!/^\d{6}$/.test(pin))throw Error('Задайте резервный код из 6 цифр.');if(!isSecureContext||!window.PublicKeyCredential||!navigator.credentials?.create)throw Error('Ключи доступа недоступны. Откройте HTTPS-сайт в совместимом Safari или Chrome.');if(!await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())throw Error('Системный способ входа недоступен на этом устройстве.');const salt=encode(random()),pinDigest=await pinHash(pin,salt),challenge=random();const credential=await navigator.credentials.create({publicKey:{challenge,rp:{id:location.hostname,name:'C Bank'},user:{id:random(),name:'marat-wallet',displayName:'Марат · C Bank'},pubKeyCredParams:[{type:'public-key',alg:-7}],authenticatorSelection:{authenticatorAttachment:'platform',residentKey:'preferred',userVerification:'required'},attestation:'none',timeout:60000}});if(!credential)throw Error('Создание ключа отменено.');verifyClient(credential.response,challenge,'webauthn.create');const key=credential.response.getPublicKey?.(),auth=credential.response.getAuthenticatorData?.();if(!key||!auth||credential.response.getPublicKeyAlgorithm?.()!==-7)throw Error('Обновите браузер: не удалось прочитать открытый ключ.');await verifyAuthenticator(auth);localStorage.setItem(lockKey,JSON.stringify({version:1,id:encode(credential.rawId),publicKey:encode(key),salt,pinHash:pinDigest}));authorized=true;}finally{pending=false}},async disable(pin){const c=config();if(!c)return;if(await pinHash(pin,c.salt)!==c.pinHash)throw Error('Неверный резервный код.');localStorage.removeItem(lockKey);authorized=true;},lock:welcome};
+  document.getElementById('welcomeFace').onclick=authenticate;
+  document.getElementById('welcomePinToggle').onclick=()=>{document.getElementById('welcomePinForm').hidden=false;document.getElementById('welcomePin').focus()};
+  document.getElementById('welcomePinForm').onsubmit=async e=>{e.preventDefault();const c=config();if(!c||pending)return;try{if(await pinHash(document.getElementById('welcomePin').value,c.salt)!==c.pinHash)throw Error('Неверный код.');authorized=true;document.getElementById('welcomePin').value='';document.getElementById('welcomePinForm').hidden=true;finish()}catch(error){message(error.message)}};
+  screen.querySelector('.welcome-skip').onclick=finish;screen.addEventListener('cancel',e=>{e.preventDefault();finish()});
+  document.addEventListener('visibilitychange',()=>{if(pending)return;if(document.hidden){wasHidden=true;clear();authorized=false;if(!screen.open)screen.showModal();showControls();}else if(wasHidden){wasHidden=false;welcome()}});
+  window.addEventListener('pageshow',e=>{if(e.persisted)welcome()});window.addEventListener('pagehide',()=>{clear();authorized=false});
+  for(const type of ['gesturestart','gesturechange'])document.addEventListener(type,e=>e.preventDefault(),{passive:false});document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});welcome();
 })();
