@@ -5,9 +5,10 @@ import sys
 root = Path(__file__).resolve().parent
 output = Path(sys.argv[1]) if len(sys.argv) > 1 else Path('/tmp/central-bank.html')
 page = (root / 'index.html').read_text()
-page = page.replace('<link rel="stylesheet" href="services.css?v=4">', '<style>' + (root / 'services.css').read_text() + '</style>')
-page = page.replace('<link rel="stylesheet" href="experience.css?v=4">', '<style>' + (root / 'experience.css').read_text() + '</style>')
-page = page.replace('<script src="app.js?v=4"></script>', '<script>' + (root / 'app.js').read_text() + '</script>')
+for asset in ['services.css', 'experience.css', 'features.css']:
+    page = page.replace(f'<link rel="stylesheet" href="{asset}?v=5">', '<style>' + (root / asset).read_text() + '</style>')
+for asset in ['vendor/jsQR.js', 'vendor/qrcode.js', 'app.js', 'features.js']:
+    page = page.replace(f'<script src="{asset}?v=5"></script>', '<script>' + (root / asset).read_text() + '</script>')
 output.parent.mkdir(parents=True, exist_ok=True)
 output.write_text(page)
 print(f'Exported: {output} ({output.stat().st_size} bytes)')
