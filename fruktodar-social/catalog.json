@@ -1,0 +1,212 @@
+{
+  "source": "User-supplied screenshots of fruktodar.ru, received 2026-10-31",
+  "status": "Names, prices, compositions and original image crops taken from user-supplied screenshots; not verified against live website.",
+  "currency": "RUB",
+  "products": [
+    {
+      "id": "set-25",
+      "name": "Фруктовый набор №25",
+      "category": [
+        "sets",
+        "sale"
+      ],
+      "price": 6319,
+      "oldPrice": 6399,
+      "unit": "набор",
+      "image": "assets/real/set-25.webp",
+      "composition": [
+        "Ананас мини",
+        "Манго кат чу",
+        "Малина",
+        "Смородина",
+        "Гранат",
+        "Королек",
+        "Хурма",
+        "Груша",
+        "Лайм",
+        "Мандарин",
+        "Клубника"
+      ],
+      "note": "После сбора вашего заказа вам будет отправлено фото для согласования",
+      "weight": "1 набор",
+      "description": "После сбора вашего заказа вам будет отправлено фото для согласования.",
+      "badge": "Набор"
+    },
+    {
+      "id": "basket-77",
+      "name": "Фруктовая корзина №77",
+      "category": [
+        "baskets",
+        "sale"
+      ],
+      "price": 7633,
+      "oldPrice": 8630,
+      "unit": "корзина",
+      "image": "assets/real/basket-77.webp",
+      "composition": [
+        "Ананас Люкс Коста Рика",
+        "Помело Премиум",
+        "Корзина Белая",
+        "Апельсин №1 Африка",
+        "Гранат №1 Перу L",
+        "Груша Конференция Класс-1",
+        "Нарезка Джекфрут Свежий (Вьетнам)",
+        "Манго Кат Чу Тайвань",
+        "Гранадилла Королевская Южная Америка",
+        "Маракуйя Колумбия",
+        "Мангустин Колумбия",
+        "Мангустин Колумбия",
+        "Питахайя Белая Таиланд",
+        "Клубника №1 Египет",
+        "Мандарин №1 Турция",
+        "Яблоко Ред Чиф №1 Местное",
+        "Мандарин Бейби Тайвань"
+      ],
+      "weight": "1 корзина",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Корзина",
+      "sourceNote": "В исходном скриншоте Мангустин Колумбия указан дважды; до сверки с сайтом запись сохранена без исправления."
+    },
+    {
+      "id": "jackfruit",
+      "name": "Джекфрут",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 19900,
+      "unit": "шт.",
+      "image": "assets/real/jackfruit.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "durian",
+      "name": "Дуриан",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 10300,
+      "unit": "шт.",
+      "image": "assets/real/durian.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "papaya-thailand",
+      "name": "Папайя «ТАЙЛАНД»",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 2890,
+      "unit": "шт.",
+      "image": "assets/real/papaya-thailand.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "papaya-baziliya",
+      "name": "Папайя «Базилия»",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 1950,
+      "unit": "шт.",
+      "image": "assets/real/papaya-baziliya.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика",
+      "sourceNote": "Написание названия сохранено со скриншота; требует сверки с сайтом."
+    },
+    {
+      "id": "pineapple-royal",
+      "name": "Ананас «Королевский» Кений",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 2190,
+      "unit": "шт.",
+      "image": "assets/real/pineapple-royal.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "pineapple-lux",
+      "name": "Ананас «Люкс» Коста Рики",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 990,
+      "unit": "шт.",
+      "image": "assets/real/pineapple-lux.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "pineapple-mini",
+      "name": "Ананас мини Маврикий",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 990,
+      "unit": "шт.",
+      "image": "assets/real/pineapple-mini.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "mango-cat-chu",
+      "name": "Манго Кат чу",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 169,
+      "unit": "шт.",
+      "image": "assets/real/mango-cat-chu.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "mango-royal-peru",
+      "name": "Манго Королевское Перу",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 1890,
+      "unit": "шт.",
+      "image": "assets/real/mango-royal-peru.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    },
+    {
+      "id": "mango-pink-giant",
+      "name": "Манго Розовый гигант",
+      "category": [
+        "fruits",
+        "exotic"
+      ],
+      "price": 1100,
+      "unit": "шт.",
+      "image": "assets/real/mango-pink-giant.webp",
+      "weight": "1 шт.",
+      "description": "Наличие, итоговый состав и стоимость подтверждаем при оформлении заказа.",
+      "badge": "Экзотика"
+    }
+  ]
+}

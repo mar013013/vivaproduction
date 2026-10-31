@@ -7,6 +7,7 @@ on:
       - "wedding-budget/**"
       - "central-bank/**"
       - "fruktodar-shop/**"
+      - "fruktodar-social/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -34,10 +35,11 @@ jobs:
 
       - name: Prepare applications
         run: |
-          mkdir -p _site/central-bank _site/fruktodar-shop
+          mkdir -p _site/central-bank _site/fruktodar-shop _site/fruktodar-social
           cp -a wedding-budget/. _site/
           cp -a central-bank/. _site/central-bank/
           cp -a fruktodar-shop/. _site/fruktodar-shop/
+          cp -a fruktodar-social/. _site/fruktodar-social/
           python3 central-bank/export.py _site/central-bank/central-bank.html
 
       - name: Upload applications
