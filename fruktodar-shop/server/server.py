@@ -87,7 +87,7 @@ class Handler(BaseHTTPRequestHandler):
         # Only frontend files are public. Database, server code and upload temp files are inaccessible.
         rel=unquote(path).lstrip('/') or 'index.html'
         if rel.endswith('/'):rel+='index.html'
-        if not (rel in ['index.html','style.css','app.js','stories.js','stories.css','stories-config.js','admin.html','admin.js'] or re.fullmatch(r'assets/[A-Za-z0-9_.-]+',rel)):
+        if not (rel in ['index.html','style.css','app.js','stories.js','stories.css','stories-config.js','admin.html','admin.js'] or re.fullmatch(r'assets/(?:real/)?[A-Za-z0-9_.-]+',rel)):
             self.respond(404,{'error':'Страница не найдена.'});return
         self.file(ROOT/rel)
     def file(self,path):
